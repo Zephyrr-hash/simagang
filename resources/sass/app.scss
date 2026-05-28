@@ -1,0 +1,38 @@
+// ===== SIMAGANG — Custom Variables & Styles =====
+
+// Palet warna utama
+$primary:        #4F46E5;
+$primary-dark:   #4338CA;
+$secondary:      #7C3AED;
+$accent:         #10B981;
+$danger:         #EF4444;
+$warning:        #F59E0B;
+$info:           #3B82F6;
+$sidebar-bg:     #1E1B4B;
+$page-bg:        #F5F3FF;
+
+// Override Bootstrap variables
+$font-family-sans-serif: 'Inter', system-ui, -apple-system, sans-serif;
+$border-radius:          0.5rem;
+$border-radius-lg:       0.75rem;
+$border-radius-sm:       0.375rem;
+
+// Fonts
+@import url('https://fonts.googleapis.com/css?family=Nunito');
+
+// Variables
+@import 'variables';
+
+// Bootstrap
+@import '~bootstrap/scss/bootstrap';
+
+// ===== Utility Classes =====
+.text-primary-custom { color: $primary !important; }
+.bg-primary-custom   { background-color: $primary !important; }
+.btn-primary-custom  {
+    background-color: $primary;
+    border-color: $primary;
+    color: #fff;
+    &:hover { background-color: $primary-dark; border-color: $primary-dark; }
+}
+.page-bg { background-color: $page-bg; }
