@@ -267,10 +267,17 @@ class ProjectController extends BaseController
             'kegiatan'      => 'required|string|max:255',
             'deskripsi_log' => 'required|string',
             'saran'         => 'nullable|string',
+            'file'          => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->with('errorForm', $validator->errors()->getMessages())->withInput();
+        }
+
+        $fileName = null;
+        if ($request->hasFile('file')) {
+            $fileName = time() . '_' . Str::uuid() . '.' . $request->file('file')->extension();
+            $request->file('file')->move(public_path('file'), $fileName);
         }
 
         Logbook::create([
@@ -278,6 +285,7 @@ class ProjectController extends BaseController
             'kegiatan'      => $request->kegiatan,
             'deskripsi_log' => $request->deskripsi_log,
             'saran'         => $request->saran,
+            'file'          => $fileName,
             'magang_id'     => $project->magang_id,
             'project_id'    => $project->id,
         ]);
@@ -305,13 +313,25 @@ class ProjectController extends BaseController
             'kegiatan'      => 'required|string|max:255',
             'deskripsi_log' => 'required|string',
             'saran'         => 'nullable|string',
+            'file'          => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->with('errorForm', $validator->errors()->getMessages())->withInput();
         }
 
-        $log->update($request->only(['tanggal', 'kegiatan', 'deskripsi_log', 'saran']));
+        $data = $request->only(['tanggal', 'kegiatan', 'deskripsi_log', 'saran']);
+
+        if ($request->hasFile('file')) {
+            if ($log->file && file_exists(public_path('file/' . $log->file))) {
+                @unlink(public_path('file/' . $log->file));
+            }
+            $fileName = time() . '_' . Str::uuid() . '.' . $request->file('file')->extension();
+            $request->file('file')->move(public_path('file'), $fileName);
+            $data['file'] = $fileName;
+        }
+
+        $log->update($data);
         return redirect()->route('project.show', $project->id)->with('success', 'Logbook berhasil diubah!');
     }
 
@@ -320,11 +340,19 @@ class ProjectController extends BaseController
         if ((int) Auth::user()->role_id !== Role::MAHASISWA) abort(403);
         $project = $this->findAuthorizedProject($projectId);
         $log     = Logbook::where('project_id', $project->id)->findOrFail($logId);
+
+        // Hapus file attachment jika ada
+        foreach (['file', 'file_spv'] as $field) {
+            if ($log->$field && file_exists(public_path('file/' . $log->$field))) {
+                @unlink(public_path('file/' . $log->$field));
+            }
+        }
+
         $log->delete();
         return redirect()->route('project.show', $project->id)->with('success', 'Logbook berhasil dihapus!');
     }
 
-    /** SPV memberikan catatan pada logbook */
+    /** SPV memberikan catatan dan opsional file pada logbook */
     public function logbookCatatan(Request $request, $projectId, $logId)
     {
         if ((int) Auth::user()->role_id !== Role::SUPERVISOR) abort(403);
@@ -332,14 +360,35 @@ class ProjectController extends BaseController
         $log     = Logbook::where('project_id', $project->id)->findOrFail($logId);
 
         $validator = Validator::make($request->all(), [
-            'catatan_spv' => 'required|string|max:1000',
+            'catatan_spv' => 'nullable|string|max:1000',
+            'file_spv'    => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->with('errorForm', $validator->errors()->getMessages());
         }
 
-        $log->update(['catatan_spv' => $request->catatan_spv]);
+        $data = [];
+
+        if ($request->filled('catatan_spv')) {
+            $data['catatan_spv'] = $request->catatan_spv;
+        }
+
+        if ($request->hasFile('file_spv')) {
+            // Hapus file lama jika ada
+            if ($log->file_spv && file_exists(public_path('file/' . $log->file_spv))) {
+                @unlink(public_path('file/' . $log->file_spv));
+            }
+            $fileName = time() . '_spv_' . Str::uuid() . '.' . $request->file('file_spv')->extension();
+            $request->file('file_spv')->move(public_path('file'), $fileName);
+            $data['file_spv'] = $fileName;
+        }
+
+        if (empty($data)) {
+            return redirect()->back()->with('errorForm', ['Harap isi catatan atau lampirkan file.']);
+        }
+
+        $log->update($data);
         return redirect()->back()->with('success', 'Catatan berhasil disimpan!');
     }
 
@@ -438,7 +487,7 @@ class ProjectController extends BaseController
         return redirect()->route('project.show', $project->id)->with('success', 'Bimbingan berhasil dihapus!');
     }
 
-    /** Dosen memberikan feedback bimbingan */
+    /** Dosen memberikan feedback dan opsional file pada bimbingan */
     public function bimbinganFeedback(Request $request, $projectId, $bimId)
     {
         if ((int) Auth::user()->role_id !== Role::DOSPEM) abort(403);
@@ -446,14 +495,35 @@ class ProjectController extends BaseController
         $bimbingan = Bimbingan::where('project_id', $project->id)->findOrFail($bimId);
 
         $validator = Validator::make($request->all(), [
-            'feedback' => 'required|string|max:1000',
+            'feedback'      => 'nullable|string|max:2000',
+            'feedback_file' => 'nullable|file|mimes:pdf,doc,docx,jpg,jpeg,png|max:5120',
         ]);
 
         if ($validator->fails()) {
             return redirect()->back()->with('errorForm', $validator->errors()->getMessages());
         }
 
-        $bimbingan->update(['feedback' => $request->feedback]);
+        $data = [];
+
+        if ($request->filled('feedback')) {
+            $data['feedback'] = $request->feedback;
+        }
+
+        if ($request->hasFile('feedback_file')) {
+            // Hapus file lama jika ada
+            if ($bimbingan->feedback_file && file_exists(public_path('file/' . $bimbingan->feedback_file))) {
+                @unlink(public_path('file/' . $bimbingan->feedback_file));
+            }
+            $fileName = time() . '_fb_' . Str::uuid() . '.' . $request->file('feedback_file')->extension();
+            $request->file('feedback_file')->move(public_path('file'), $fileName);
+            $data['feedback_file'] = $fileName;
+        }
+
+        if (empty($data)) {
+            return redirect()->back()->with('errorForm', ['Harap isi feedback atau lampirkan file.']);
+        }
+
+        $bimbingan->update($data);
         return redirect()->back()->with('success', 'Feedback berhasil dikirim!');
     }
 

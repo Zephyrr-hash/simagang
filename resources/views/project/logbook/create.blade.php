@@ -43,7 +43,7 @@
         @if(session('errorForm'))
         <div class="error-alert"><strong>Kesalahan:</strong><ul>@foreach(session('errorForm') as $msgs)@foreach($msgs as $m)<li>{{ $m }}</li>@endforeach @endforeach</ul></div>
         @endif
-        <form action="{{ route('project.logbook.store', $project->id) }}" method="POST">
+        <form action="{{ route('project.logbook.store', $project->id) }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="form-group">
                 <label class="form-label">Tanggal <span class="req">*</span></label>
@@ -60,6 +60,11 @@
             <div class="form-group">
                 <label class="form-label">Saran / Catatan</label>
                 <textarea name="saran" class="form-control-c" rows="3" placeholder="Saran perbaikan atau catatan tambahan...">{{ old('saran') }}</textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Lampiran File <span style="font-size:0.75rem;color:#9CA3AF;font-weight:400;">(opsional)</span></label>
+                <input type="file" name="file" class="form-control-c" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+                <p style="font-size:0.75rem;color:#9CA3AF;margin-top:0.3rem;">Format: PDF, DOC, DOCX, JPG, PNG. Maks 5MB.</p>
             </div>
             <div class="form-actions">
                 <button type="submit" class="btn-save">Simpan Logbook</button>

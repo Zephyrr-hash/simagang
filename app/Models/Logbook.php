@@ -12,7 +12,7 @@ class Logbook extends Model
     protected $table = 'logbook';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'tanggal', 'kegiatan', 'deskripsi_log', 'saran', 'magang_id', 'catatan_spv', 'project_id'
+        'tanggal', 'kegiatan', 'deskripsi_log', 'saran', 'magang_id', 'catatan_spv', 'project_id', 'file', 'file_spv'
     ];
 
     public function magang(){

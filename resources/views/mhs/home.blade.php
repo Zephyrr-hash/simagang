@@ -119,7 +119,7 @@
         @elseif($statusId == 2)
             <p class="status-banner-title">Anda sedang dalam program magang</p>
             <p class="status-banner-desc">Jangan lupa isi logbook harian dan ajukan laporan bimbingan secara rutin.</p>
-            <a href="{{ route('logbook.index') }}" class="status-banner-action">Isi Logbook →</a>
+            <a href="{{ route('project.index') }}" class="status-banner-action">Lihat Project →</a>
         @elseif($statusId == 3)
             <p class="status-banner-title">Selamat! Anda telah menyelesaikan program magang 🎉</p>
             <p class="status-banner-desc">Terima kasih atas dedikasi Anda selama program magang berlangsung.</p>
@@ -143,20 +143,20 @@
     />
     @if($statusId == 2 || $statusId == 3)
     <x-stat-card
-        title="Entri Logbook"
+        title="Project Magang"
         :value="$log"
         color="emerald"
-        description="Total entri"
-        icon="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
-        link="{{ route('logbook.index') }}"
+        description="Logbook & bimbingan"
+        icon="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3"
+        link="{{ route('project.index') }}"
     />
     <x-stat-card
-        title="Entri Bimbingan"
+        title="Laporan Bimbingan"
         :value="$bim"
         color="violet"
         description="Total laporan"
         icon="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 0 1 .865-.501 48.172 48.172 0 0 0 3.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0 0 12 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018Z"
-        link="{{ route('bimbingan.index') }}"
+        link="{{ route('project.index') }}"
     />
     @endif
 </div>

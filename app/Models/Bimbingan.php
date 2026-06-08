@@ -12,7 +12,7 @@ class Bimbingan extends Model
     protected $table = 'bimbingan';
     protected $primaryKey = 'id';
     protected $fillable = [
-        'catatan', 'tgl_bimbingan', 'file', 'feedback', 'magang_id', 'project_id'
+        'catatan', 'tgl_bimbingan', 'file', 'feedback', 'feedback_file', 'magang_id', 'project_id'
     ];
 
     public function magang(): \Illuminate\Database\Eloquent\Relations\BelongsTo

@@ -76,15 +76,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a href="{{ route('logbook.index') }}" class="nav-link @if(Route::is('logbook.index')) {{ 'active' }} @endif">
+                            <a href="{{ route('project.index') }}" class="nav-link @if(Route::is('project.*')) {{ 'active' }} @endif">
                             <i class="nav-icon fas fa-book-open"></i>
-                            <p>Log Book</p>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a href="{{ route('bimbingan.index') }}" class="nav-link @if(Route::is('bimbingan.index')) {{ 'active' }} @endif">
-                            <i class="nav-icon fas fa-book-open"></i>
-                            <p>Bimbingan</p>
+                            <p>Project</p>
                             </a>
                         </li>
                         <li class="nav-item">

@@ -201,19 +201,54 @@
                     <p class="log-desc">{{ $log->deskripsi_log }}</p>
                     @if($log->saran)<p class="log-saran">💡 {{ $log->saran }}</p>@endif
 
+                    {{-- File lampiran mahasiswa --}}
+                    @if($log->file)
+                    <p style="font-size:0.8rem;margin-bottom:0.5rem;">
+                        <a href="{{ asset('file/'.$log->file) }}" target="_blank"
+                           style="display:inline-flex;align-items:center;gap:0.35rem;color:#4F46E5;font-weight:600;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                            Lampiran Mahasiswa
+                        </a>
+                    </p>
+                    @endif
+
+                    {{-- File SPV jika ada --}}
+                    @if($log->file_spv)
+                    <p style="font-size:0.8rem;margin-bottom:0.5rem;">
+                        <a href="{{ asset('file/'.$log->file_spv) }}" target="_blank"
+                           style="display:inline-flex;align-items:center;gap:0.35rem;color:#059669;font-weight:600;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                            Lampiran Supervisor
+                        </a>
+                    </p>
+                    @endif
+
                     {{-- Catatan SPV --}}
                     @if($log->catatan_spv)
                     <div class="catatan-spv-box">
                         <strong style="display:block;font-size:0.7rem;margin-bottom:0.2rem;">✅ Catatan Supervisor:</strong>
                         {{ $log->catatan_spv }}
                     </div>
-                    @elseif($roleId === \App\Models\Role::SUPERVISOR)
-                    <div class="catatan-spv-form">
-                        <form action="{{ route('project.logbook.catatan', [$project->id, $log->id]) }}" method="POST">
+                    @endif
+
+                    {{-- Form catatan + file SPV --}}
+                    @if($roleId === \App\Models\Role::SUPERVISOR)
+                    <div class="catatan-spv-form" style="margin-top:0.6rem;">
+                        <form action="{{ route('project.logbook.catatan', [$project->id, $log->id]) }}" method="POST" enctype="multipart/form-data">
                             @csrf
-                            <label>Berikan Catatan:</label>
-                            <textarea name="catatan_spv" rows="2" placeholder="Catatan untuk mahasiswa..."></textarea>
-                            <button type="submit" class="btn-catatan">Simpan Catatan</button>
+                            <label>{{ $log->catatan_spv ? 'Perbarui Catatan:' : 'Berikan Catatan:' }}</label>
+                            <textarea name="catatan_spv" rows="2" placeholder="Catatan untuk mahasiswa...">{{ $log->catatan_spv }}</textarea>
+                            <div style="margin-top:0.5rem;">
+                                <label style="font-size:0.72rem;font-weight:600;color:#065F46;display:block;margin-bottom:0.3rem;">
+                                    Lampiran File <span style="font-weight:400;opacity:0.7;">(opsional)</span>
+                                </label>
+                                <input type="file" name="file_spv" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                       style="width:100%;font-size:0.8rem;padding:0.4rem 0.5rem;border:1.5px solid #A7F3D0;border-radius:7px;background:#fff;">
+                                <p style="font-size:0.7rem;color:#6B7280;margin-top:0.2rem;">PDF, DOC, DOCX, JPG, PNG. Maks 5MB.</p>
+                            </div>
+                            <button type="submit" class="btn-catatan">
+                                {{ $log->catatan_spv ? 'Perbarui' : 'Simpan Catatan' }}
+                            </button>
                         </form>
                     </div>
                     @endif
@@ -258,23 +293,51 @@
                     <p class="bim-catatan">{{ $bim->catatan }}</p>
                     @if($bim->file)
                     <p style="font-size:0.8rem;margin-bottom:0.5rem;">
-                        <a href="{{ asset('file/'.$bim->file) }}" target="_blank" style="color:#4F46E5;">📎 Lihat File Laporan</a>
+                        <a href="{{ asset('file/'.$bim->file) }}" target="_blank"
+                           style="display:inline-flex;align-items:center;gap:0.35rem;color:#4F46E5;font-weight:600;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                            Lampiran Laporan
+                        </a>
                     </p>
                     @endif
 
-                    {{-- Feedback Dosen --}}
+                    {{-- File feedback dosen jika ada --}}
+                    @if($bim->feedback_file)
+                    <p style="font-size:0.8rem;margin-bottom:0.5rem;">
+                        <a href="{{ asset('file/'.$bim->feedback_file) }}" target="_blank"
+                           style="display:inline-flex;align-items:center;gap:0.35rem;color:#7C3AED;font-weight:600;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+                            Lampiran Feedback Dosen
+                        </a>
+                    </p>
+                    @endif
+
+                    {{-- Feedback Dosen (teks) --}}
                     @if($bim->feedback)
                     <div class="feedback-box">
                         <strong style="display:block;font-size:0.7rem;margin-bottom:0.2rem;">✅ Feedback Dosen Pembimbing:</strong>
                         {{ $bim->feedback }}
                     </div>
-                    @elseif($roleId === \App\Models\Role::DOSPEM)
-                    <div class="feedback-form">
-                        <form action="{{ route('project.bimbingan.feedback', [$project->id, $bim->id]) }}" method="POST">
+                    @endif
+
+                    {{-- Form feedback dosen --}}
+                    @if($roleId === \App\Models\Role::DOSPEM)
+                    <div class="feedback-form" style="margin-top:0.6rem;">
+                        <form action="{{ route('project.bimbingan.feedback', [$project->id, $bim->id]) }}" method="POST" enctype="multipart/form-data">
                             @csrf
-                            <label>Berikan Feedback:</label>
-                            <textarea name="feedback" rows="3" placeholder="Tulis feedback untuk mahasiswa..."></textarea>
-                            <button type="submit" class="btn-feedback">Kirim Feedback</button>
+                            <label>{{ $bim->feedback ? 'Perbarui Feedback:' : 'Berikan Feedback:' }}</label>
+                            <textarea name="feedback" rows="3" placeholder="Tulis feedback untuk mahasiswa...">{{ $bim->feedback }}</textarea>
+                            <div style="margin-top:0.5rem;">
+                                <label style="font-size:0.72rem;font-weight:600;color:#4C1D95;display:block;margin-bottom:0.3rem;">
+                                    Lampiran File <span style="font-weight:400;opacity:0.7;">(opsional)</span>
+                                </label>
+                                <input type="file" name="feedback_file" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                       style="width:100%;font-size:0.8rem;padding:0.4rem 0.5rem;border:1.5px solid #DDD6FE;border-radius:7px;background:#fff;">
+                                <p style="font-size:0.7rem;color:#6B7280;margin-top:0.2rem;">PDF, DOC, DOCX, JPG, PNG. Maks 5MB.</p>
+                            </div>
+                            <button type="submit" class="btn-feedback">
+                                {{ $bim->feedback ? 'Perbarui Feedback' : 'Kirim Feedback' }}
+                            </button>
                         </form>
                     </div>
                     @endif
