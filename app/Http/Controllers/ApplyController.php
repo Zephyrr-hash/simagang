@@ -78,10 +78,29 @@ class ApplyController extends BaseController
         $low   = Lowongan::with(['mitra', 'kategori'])->findOrFail($id);
 
         $button = 'enable';
+
+        // Profil belum lengkap
         if (!$mhsId->NIM || !$mhsId->telepon_mhs || !$mhsId->pengalaman ||
             !$mhsId->jurusan_id || !$mhsId->jenis_kelamin ||
             !$mhsId->tgl_lahir || !$mhsId->foto_mhs) {
             $button = 'disabled';
+        }
+
+        // Sudah diterima di suatu lowongan atau sedang aktif magang
+        $sudahDiterima = Magang::where('mhs_id', $mhsId->id)
+            ->where('approval', Magang::DITERIMA)
+            ->exists();
+        if ($sudahDiterima) {
+            $button = 'disabled';
+        }
+
+        // Sudah pernah apply ke lowongan ini (pending atau diterima)
+        $sudahApply = Magang::where('mhs_id', $mhsId->id)
+            ->where('lowongan_id', $id)
+            ->whereIn('approval', [Magang::PENDING, Magang::DITERIMA])
+            ->exists();
+        if ($sudahApply) {
+            $button = 'already_applied';
         }
 
         $authProfile = $this->getAuthProfile();
@@ -112,13 +131,23 @@ class ApplyController extends BaseController
     {
         $mhsId = Mahasiswa::where('user_id', Auth::id())->firstOrFail();
 
-        // Cek apakah sudah punya pengajuan aktif (belum ditolak)
-        $existing = Magang::where('mhs_id', $mhsId->id)
+        // Blokir jika sudah punya pengajuan DITERIMA (sedang/sudah magang)
+        $sudahDiterima = Magang::where('mhs_id', $mhsId->id)
+            ->where('approval', Magang::DITERIMA)
+            ->exists();
+
+        if ($sudahDiterima) {
+            return redirect()->back()->with('error', 'Anda sudah memiliki magang yang aktif.');
+        }
+
+        // Blokir jika sudah apply ke lowongan yang sama
+        $sudahApply = Magang::where('mhs_id', $mhsId->id)
+            ->where('lowongan_id', $request->lowongan_id)
             ->whereIn('approval', [Magang::PENDING, Magang::DITERIMA])
             ->exists();
 
-        if ($existing) {
-            return redirect()->back()->with('error', 'Anda sudah memiliki pengajuan atau magang yang aktif.');
+        if ($sudahApply) {
+            return redirect()->back()->with('error', 'Anda sudah pernah mengajukan lamaran ke lowongan ini.');
         }
 
         try {
@@ -128,11 +157,15 @@ class ApplyController extends BaseController
                     'lowongan_id' => $request->lowongan_id,
                     'approval'    => Magang::PENDING,
                 ]);
-                $mhsId->update(['status_id' => 4]); // Sedang Mengajukan
+                // Hanya update status jika sebelumnya Belum Magang (1)
+                // agar tidak menimpa status lain
+                if ($mhsId->status_id == 1) {
+                    $mhsId->update(['status_id' => 4]); // Sedang Mengajukan
+                }
             });
-            return redirect()->route('mahasiswa.home')->with('success', 'Lowongan berhasil diajukan!');
+            return redirect()->route('mahasiswa.home')->with('success', 'Lamaran berhasil dikirim!');
         } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Lowongan gagal diajukan!');
+            return redirect()->back()->with('error', 'Lamaran gagal dikirim!');
         }
     }
 

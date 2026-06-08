@@ -661,8 +661,8 @@
     'use strict';
 
     // Query alamat untuk geocoding
-    var alamatQuery = {{ Js::from($alamatQuery ?? ($low->alamat_mitra ?? '')) }};
-    var namaPerusahaan = {{ Js::from($low->nama_mitra ?? '') }};
+    var alamatQuery = {!! json_encode($alamatQuery ?? ($low->alamat_mitra ?? '')) !!};
+    var namaPerusahaan = {!! json_encode($low->nama_mitra ?? '') !!};
 
     if (!alamatQuery) {
         document.getElementById('map-container').style.display = 'none';
