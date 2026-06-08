@@ -8,7 +8,7 @@
 @endsection
 @push('styles')
 <style>
-.profile-card{background:#fff;border:1px solid #E0E7FF;border-radius:14px;overflow:hidden;max-width:680px;}
+.profile-card{background:#fff;border:1px solid #E0E7FF;border-radius:14px;overflow:hidden;width:100%;max-width:none;}
 .profile-header{background:linear-gradient(135deg,#4F46E5,#7C3AED);padding:2rem;display:flex;align-items:center;gap:1.5rem;}
 .profile-avatar{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid rgba(255,255,255,0.4);flex-shrink:0;}
 .profile-avatar-init{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:2rem;font-weight:700;color:#fff;flex-shrink:0;border:3px solid rgba(255,255,255,0.4);}
@@ -25,6 +25,8 @@
 </style>
 @endpush
 @section('content')
+@php $editUrl = $profile ? route('profile.edit', $profile->id) : '#'; @endphp
+@include('components.profile-incomplete-banner', ['editUrl' => $editUrl])
 <div class="profile-card">
     <div class="profile-header">
         @if($profile?->foto_depart && file_exists(public_path('images/'.$profile->foto_depart)))
@@ -42,10 +44,17 @@
         <div class="info-row"><span class="info-label">Alamat</span><span class="info-value">{{ $profile?->alamat_depart ?? '—' }}</span></div>
         <div class="info-row"><span class="info-label">Telepon</span><span class="info-value">{{ $profile?->telepon_depart ?? '—' }}</span></div>
         <div class="info-row"><span class="info-label">NIDN</span><span class="info-value">{{ $profile?->NIDN ?? '—' }}</span></div>
-        <a href="{{ route('profile.edit', 1) }}" class="btn-edit">
+        @if($profile)
+        <a href="{{ route('profile.edit', $profile->id) }}" class="btn-edit">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125"/></svg>
             Edit Profil
         </a>
+        @else
+        <a href="{{ route('profile.create') }}" class="btn-edit">
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="currentColor" viewBox="0 0 16 16"><path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+            Buat Profil
+        </a>
+        @endif
     </div>
 </div>
 @endsection

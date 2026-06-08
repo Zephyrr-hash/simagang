@@ -68,5 +68,6 @@ class Kernel extends HttpKernel
         'is_supervisor' => \App\Http\Middleware\IsSupervisor::class,
         'is_mahasiswa' => \App\Http\Middleware\IsMahasiswa::class,
         'is_approve' => \App\Http\Middleware\IsApprove::class,
+        'profile_complete' => \App\Http\Middleware\IsProfileComplete::class,
     ];
 }

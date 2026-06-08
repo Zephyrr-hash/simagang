@@ -72,6 +72,37 @@
             @if($data->nilai !== null)
             <div class="info-row"><span class="info-label">Nilai</span><span class="info-value" style="font-weight:700;color:#4F46E5;">{{ $data->nilai }}</span></div>
             @endif
+
+            {{-- ===== DOSEN PEMBIMBING ===== --}}
+            @if($data->dosen)
+            <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #EEF2FF;">
+                <p style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#6B7280;margin-bottom:0.75rem;">Dosen Pembimbing</p>
+                <div style="display:flex;align-items:center;gap:0.875rem;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:10px;padding:0.875rem 1rem;">
+                    {{-- Avatar dosen --}}
+                    @if($data->dosen->foto_dosen && file_exists(public_path('images/'.$data->dosen->foto_dosen)))
+                        <img src="{{ asset('images/'.$data->dosen->foto_dosen) }}"
+                             alt="{{ $data->dosen->nama_dosen }}"
+                             style="width:44px;height:44px;border-radius:50%;object-fit:cover;border:2px solid #C4B5FD;flex-shrink:0;">
+                    @else
+                        <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#4F46E5,#7C3AED);display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;color:#fff;flex-shrink:0;">
+                            {{ strtoupper(substr($data->dosen->nama_dosen, 0, 1)) }}
+                        </div>
+                    @endif
+                    <div style="flex:1;min-width:0;">
+                        <p style="font-size:0.875rem;font-weight:700;color:#1E1B4B;margin:0 0 0.1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                            {{ $data->dosen->nama_dosen }}
+                        </p>
+                        <p style="font-size:0.78rem;color:#7C3AED;margin:0;font-weight:500;">NIP: {{ $data->dosen->NIP ?? '—' }}</p>
+                        <p style="font-size:0.78rem;color:#6B7280;margin:0.1rem 0 0;">{{ $data->dosen->telepon_dosen ?? '' }}</p>
+                    </div>
+                </div>
+            </div>
+            @else
+            <div style="margin-top:1.25rem;padding-top:1.25rem;border-top:1px solid #EEF2FF;">
+                <p style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#6B7280;margin-bottom:0.5rem;">Dosen Pembimbing</p>
+                <p style="font-size:0.82rem;color:#9CA3AF;font-style:italic;margin:0;">Belum ditugaskan.</p>
+            </div>
+            @endif
         @else
             <p style="color:#6B7280;font-size:0.875rem;">Belum ada riwayat magang.</p>
         @endif

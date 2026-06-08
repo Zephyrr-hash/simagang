@@ -21,7 +21,7 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
         margin-bottom: 1.75rem;
-        max-width: 640px;
+        width: 100%;
     }
     @media (max-width: 575px) { .stats-grid { grid-template-columns: 1fr; } }
 
@@ -29,7 +29,7 @@
         display: grid;
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
-        max-width: 640px;
+        width: 100%;
     }
     @media (max-width: 575px) { .action-grid { grid-template-columns: 1fr; } }
 
@@ -75,12 +75,12 @@
 
 <div class="stats-grid">
     <x-stat-card
-        title="Mahasiswa Logbook"
+        title="Mahasiswa Aktif"
         :value="$mhsLogbook"
         color="indigo"
         description="Aktif saat ini"
-        icon="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
-        link="{{ route('spv.index') }}"
+        icon="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3"
+        link="{{ route('project.index') }}"
     />
     <x-stat-card
         title="Penilaian Pending"
@@ -95,15 +95,26 @@
 <div class="quick-actions">
     <h2>Aksi Cepat</h2>
     <div class="action-grid">
-        <a href="{{ route('spv.index') }}" class="action-card">
+        <a href="{{ route('project.index') }}" class="action-card">
             <div class="action-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3" />
                 </svg>
             </div>
             <div>
-                <p class="action-title">Lihat Logbook</p>
-                <p class="action-desc">Review logbook harian mahasiswa</p>
+                <p class="action-title">Project Mahasiswa</p>
+                <p class="action-desc">Kelola project, logbook, dan bimbingan</p>
+            </div>
+        </a>
+        <a href="{{ route('project.create') }}" class="action-card">
+            <div class="action-icon" style="background: linear-gradient(135deg,#059669,#10B981);">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+            </div>
+            <div>
+                <p class="action-title">Buat Project Baru</p>
+                <p class="action-desc">Tambahkan project untuk mahasiswa</p>
             </div>
         </a>
         <a href="{{ route('spv.penilaian') }}" class="action-card">

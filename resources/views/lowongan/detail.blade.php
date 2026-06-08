@@ -492,7 +492,7 @@
                         </svg>
                         Tentang Perusahaan
                     </h2>
-                    <div class="d-flex align-items-center gap-3">
+                    <div class="d-flex align-items-center gap-3 mb-3">
                         {{-- Logo / Foto Mitra --}}
                         @if($low->foto_mitra)
                             <img
@@ -515,8 +515,30 @@
                                         <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/>
                                     </svg>
                                     {{ $low->alamat_mitra }}
+                                    @if($low->nama_kecamatan), {{ $low->nama_kecamatan }}@endif
+                                    @if($low->nama_kabupaten), {{ $low->nama_kabupaten }}@endif
+                                    @if($low->nama_provinsi), {{ $low->nama_provinsi }}@endif
                                 </p>
                             @endif
+                        </div>
+                    </div>
+
+                    {{-- ===== MAPS LEAFLET ===== --}}
+                    @php
+                        $alamatQuery = collect([
+                            $low->alamat_mitra,
+                            $low->nama_kecamatan ?? null,
+                            $low->nama_kabupaten ?? null,
+                            $low->nama_provinsi  ?? null,
+                            'Indonesia',
+                        ])->filter()->implode(', ');
+                    @endphp
+                    <div id="map-container" style="border-radius:10px;overflow:hidden;border:1px solid #E0E7FF;">
+                        <div id="map" style="height:280px;width:100%;"></div>
+                        <div style="background:#F5F3FF;padding:0.5rem 0.75rem;font-size:0.75rem;color:#6B7280;display:flex;align-items:center;gap:0.4rem;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
+                            {{ $alamatQuery }}
+                            &nbsp;|&nbsp; <span style="opacity:0.7;">© OpenStreetMap</span>
                         </div>
                     </div>
                 </div>
@@ -630,4 +652,78 @@
     </div>
 </footer>
 
-@endsection
+@push('scripts')
+{{-- Leaflet CSS + JS (OpenStreetMap, gratis tanpa API key) --}}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLcE=" crossorigin=""></script>
+<script>
+(function () {
+    'use strict';
+
+    // Query alamat untuk geocoding
+    var alamatQuery = {{ Js::from($alamatQuery ?? ($low->alamat_mitra ?? '')) }};
+    var namaPerusahaan = {{ Js::from($low->nama_mitra ?? '') }};
+
+    if (!alamatQuery) {
+        document.getElementById('map-container').style.display = 'none';
+        return;
+    }
+
+    // Default center: Indonesia
+    var defaultLat = -2.548926;
+    var defaultLng = 118.014863;
+    var defaultZoom = 5;
+
+    // Init peta dengan default dulu
+    var map = L.map('map').setView([defaultLat, defaultLng], defaultZoom);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    // Custom marker icon (ungu sesuai tema)
+    var markerIcon = L.divIcon({
+        html: '<div style="width:32px;height:32px;background:linear-gradient(135deg,#4F46E5,#7C3AED);border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(79,70,229,0.4);"></div>',
+        iconSize: [32, 32],
+        iconAnchor: [16, 32],
+        popupAnchor: [0, -34],
+        className: ''
+    });
+
+    // Geocoding via Nominatim (OpenStreetMap)
+    var geocodeUrl = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(alamatQuery);
+
+    fetch(geocodeUrl, {
+        headers: { 'Accept-Language': 'id', 'User-Agent': 'SIMAGANG-App' }
+    })
+    .then(function(res) { return res.json(); })
+    .then(function(data) {
+        if (data && data.length > 0) {
+            var lat = parseFloat(data[0].lat);
+            var lng = parseFloat(data[0].lon);
+            map.setView([lat, lng], 15);
+            L.marker([lat, lng], { icon: markerIcon })
+                .addTo(map)
+                .bindPopup(
+                    '<strong style="font-size:13px;">' + namaPerusahaan + '</strong>' +
+                    '<br><span style="font-size:11px;color:#6B7280;">' + alamatQuery + '</span>' +
+                    '<br><a href="https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lng + '&zoom=16" target="_blank" style="font-size:11px;color:#4F46E5;">Buka di OpenStreetMap ↗</a>'
+                )
+                .openPopup();
+        } else {
+            // Tidak ditemukan, tampilkan pesan di map
+            document.getElementById('map').innerHTML =
+                '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-size:0.85rem;background:#F9FAFB;flex-direction:column;gap:0.5rem;">' +
+                '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>' +
+                '<span>Lokasi tidak dapat ditampilkan di peta</span></div>';
+        }
+    })
+    .catch(function() {
+        document.getElementById('map').innerHTML =
+            '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-size:0.85rem;background:#F9FAFB;">Gagal memuat peta</div>';
+    });
+})();
+</script>
+@endpush
+

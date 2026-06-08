@@ -50,6 +50,20 @@
         <div class="info-row"><span class="info-label">NIM</span><span class="info-value">{{ $mhs->NIM ?? '—' }}</span></div>
         <div class="info-row"><span class="info-label">Jurusan</span><span class="info-value">{{ $mhs->jurusan?->jurusan ?? '—' }}</span></div>
         <div class="info-row"><span class="info-label">Status</span><span class="info-value">{{ $mhs->status?->status ?? '—' }}</span></div>
+        @if(isset($mag) && $mag)
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid #EEF2FF;">
+            <p style="font-size:0.7rem;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:#6B7280;margin-bottom:0.6rem;">Detail Magang</p>
+            <div class="info-row"><span class="info-label">Lowongan</span><span class="info-value">{{ $mag->lowongan?->nama_low ?? '—' }}</span></div>
+            <div class="info-row"><span class="info-label">Perusahaan</span><span class="info-value">{{ $mag->lowongan?->mitra?->nama_mitra ?? '—' }}</span></div>
+            @if($mag->tgl_mulai)
+            <div class="info-row"><span class="info-label">Mulai</span><span class="info-value">{{ \Carbon\Carbon::parse($mag->tgl_mulai)->format('d/m/Y') }}</span></div>
+            <div class="info-row"><span class="info-label">Selesai</span><span class="info-value">{{ $mag->tgl_selesai ? \Carbon\Carbon::parse($mag->tgl_selesai)->format('d/m/Y') : '—' }}</span></div>
+            @endif
+            @if($mag->dosen)
+            <div class="info-row"><span class="info-label">Dospem</span><span class="info-value">{{ $mag->dosen->nama_dosen }}</span></div>
+            @endif
+        </div>
+        @endif
         <div class="info-row">
             <span class="info-label">Skill</span>
             <span class="info-value">

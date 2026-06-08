@@ -9,7 +9,7 @@
 @endsection
 @push('styles')
 <style>
-.form-card{background:#fff;border:1px solid #E0E7FF;border-radius:14px;overflow:hidden;max-width:640px;}
+.form-card{background:#fff;border:1px solid #E0E7FF;border-radius:14px;overflow:hidden;width:100%;max-width:none;}
 .form-card-header{background:linear-gradient(135deg,#4F46E5,#7C3AED);padding:1.25rem 1.75rem;color:#fff;}
 .form-card-header h1{font-size:1.1rem;font-weight:700;margin:0 0 0.2rem;}
 .form-card-header p{font-size:0.82rem;opacity:0.85;margin:0;}
@@ -36,7 +36,7 @@
     </div>
     <div class="form-card-body">
         @if(session('errorForm'))
-        <div class="error-alert"><strong>Terdapat kesalahan:</strong><ul>@foreach(session('errorForm') as $msgs)@foreach($msgs as $m)<li>{{ $m }}</li>@endforeach@endforeach</ul></div>
+        <div class="error-alert"><strong>Terdapat kesalahan:</strong><ul>@foreach(session('errorForm') as $msgs)@foreach($msgs as $m)<li>{{ $m }}</li>@endforeach @endforeach</ul></div>
         @endif
         <form action="{{ route('logbook.store') }}" method="POST">
             @csrf
@@ -56,6 +56,21 @@
                 <label class="form-label">Saran / Catatan <span class="req">*</span></label>
                 <textarea name="saran" class="form-control-c" rows="3" placeholder="Saran untuk perbaikan atau catatan tambahan..." required>{{ old('saran') }}</textarea>
             </div>
+            @if($projects->isNotEmpty())
+            <div class="form-group">
+                <label class="form-label">Terkait Project (opsional)</label>
+                <select name="project_id" class="form-control-c">
+                    <option value="">— Tidak terkait project —</option>
+                    @foreach($projects as $proj)
+                        <option value="{{ $proj->id }}" {{ old('project_id') == $proj->id ? 'selected' : '' }}>
+                            {{ $proj->nama_project }}
+                            @if($proj->teknologi) — {{ $proj->teknologi }} @endif
+                        </option>
+                    @endforeach
+                </select>
+                <p style="font-size:0.75rem;color:#9CA3AF;margin-top:0.3rem;">Pilih project jika aktivitas ini bagian dari project tertentu.</p>
+            </div>
+            @endif
             <div class="form-actions">
                 <button type="submit" class="btn-save">Simpan Aktivitas</button>
                 <a href="{{ route('logbook.index') }}" class="btn-cancel">Batal</a>

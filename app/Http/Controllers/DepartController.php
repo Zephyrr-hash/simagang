@@ -25,10 +25,12 @@ class DepartController extends BaseController
         $skill = SkillMhs::join('skill', 'skill_mhs.skill_id', '=', 'skill.id')
                 ->where('skill_mhs.mhs_id', $mhs->id)
                 ->select('skill')->get();
-        $data = Magang::leftJoin('lowongan', 'magang.lowongan_id', '=', 'lowongan.id')
-        ->leftJoin('mitra', 'lowongan.mitra_id', '=', 'mitra.id')
-        ->where('mhs_id', $mhs->id)
-        ->first();
+        $data = Magang::with(['dosen', 'spv'])
+            ->leftJoin('lowongan', 'magang.lowongan_id', '=', 'lowongan.id')
+            ->leftJoin('mitra', 'lowongan.mitra_id', '=', 'mitra.id')
+            ->where('mhs_id', $mhs->id)
+            ->select('magang.*', 'lowongan.nama_low', 'mitra.nama_mitra')
+            ->first();
         $authProfile = $this->getAuthProfile();
         return view('depart.mhs.show', compact('mhs', 'data', 'authProfile', 'skill'));
     }

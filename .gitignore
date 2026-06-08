@@ -11,3 +11,20 @@ Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+
+# Uploaded files
+/public/images/*
+!/public/images/.gitkeep
+/public/file/*
+!/public/file/.gitkeep
+
+# Session files
+/storage/framework/sessions/*
+!/storage/framework/sessions/.gitignore
+
+# Temporary / debug files
+compiled_view.txt
+log_tail.txt
+composer-setup.php
+composer.phar
+PERBAIKAN_UI_LOG.md

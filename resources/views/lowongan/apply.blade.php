@@ -327,6 +327,57 @@
         .action-bar { flex-direction: column; align-items: stretch; }
         .btn-ajukan, .btn-batal { justify-content: center; }
     }
+
+    /* ===== SWEETALERT2 CUSTOM THEME ===== */
+    .swal2-popup {
+        border-radius: 16px !important;
+        font-family: 'Inter', sans-serif !important;
+        padding: 2rem !important;
+    }
+    .swal2-title {
+        font-size: 1.15rem !important;
+        font-weight: 700 !important;
+        color: #1E1B4B !important;
+    }
+    .swal2-html-container {
+        font-size: 0.875rem !important;
+        color: #6B7280 !important;
+        line-height: 1.6 !important;
+    }
+    .swal2-icon.swal2-question {
+        border-color: #C7D2FE !important;
+        color: #4F46E5 !important;
+    }
+    .swal2-icon.swal2-question .swal2-icon-content {
+        color: #4F46E5 !important;
+    }
+    .swal-btn-confirm {
+        background: linear-gradient(135deg, #4F46E5, #7C3AED) !important;
+        border: none !important;
+        border-radius: 9px !important;
+        padding: 0.6rem 1.5rem !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+        font-family: 'Inter', sans-serif !important;
+        box-shadow: none !important;
+    }
+    .swal-btn-cancel {
+        background: #fff !important;
+        color: #6B7280 !important;
+        border: 1.5px solid #D1D5DB !important;
+        border-radius: 9px !important;
+        padding: 0.6rem 1.25rem !important;
+        font-weight: 600 !important;
+        font-size: 0.875rem !important;
+        font-family: 'Inter', sans-serif !important;
+        box-shadow: none !important;
+    }
+    .swal-btn-cancel:hover {
+        background: #F9FAFB !important;
+        border-color: #9CA3AF !important;
+        color: #374151 !important;
+    }
+    .swal2-actions { gap: 0.5rem !important; }
 </style>
 @endpush
 
@@ -526,7 +577,7 @@
                                     @if ($skill->count() > 0)
                                         <div class="skill-badges">
                                             @foreach ($skill as $s)
-                                                <span class="skill-badge">{{ $s->skill }}</span>
+                                                <span class="skill-badge">{{ $s->skill->skill ?? '—' }}</span>
                                             @endforeach
                                         </div>
                                     @else
@@ -624,11 +675,11 @@
 
                     <div class="action-bar">
                         <button
-                            type="submit"
+                            type="button"
                             class="btn-ajukan"
                             {{ $button == 'disabled' ? 'disabled' : '' }}
                             @if ($button != 'disabled')
-                                onclick="return confirm('Yakin ingin mengajukan lamaran untuk lowongan ini?')"
+                                id="btn-ajukan-submit"
                             @endif
                         >
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
@@ -669,3 +720,32 @@
 </footer>
 
 @endsection
+
+@push('scripts')
+<script>
+    @if ($button != 'disabled')
+    document.getElementById('btn-ajukan-submit').addEventListener('click', function () {
+        Swal.fire({
+            title: 'Ajukan Lamaran?',
+            html: 'Anda akan mendaftar ke lowongan <strong>{{ $low->nama_low }}</strong>.<br>Pastikan data Anda sudah benar.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4F46E5',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: '<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" viewBox="0 0 16 16" style="margin-right:5px;vertical-align:-2px;"><path d="M15.964.686a.5.5 0 0 0-.65-.65L.767 5.855H.766l-.452.18a.5.5 0 0 0-.082.887l.41.26.001.002 4.995 3.178 3.178 4.995.002.002.26.41a.5.5 0 0 0 .886-.083l6-15Zm-1.833 1.89L6.637 10.07l-.215-.338a.5.5 0 0 0-.154-.154l-.338-.215 7.494-7.494 1.178-.471-.47 1.178Z"/></svg> Ya, Ajukan',
+            cancelButtonText: 'Batal',
+            reverseButtons: true,
+            focusConfirm: false,
+            customClass: {
+                confirmButton: 'swal-btn-confirm',
+                cancelButton: 'swal-btn-cancel',
+            },
+        }).then(function (result) {
+            if (result.isConfirmed) {
+                document.getElementById('apply-form').submit();
+            }
+        });
+    });
+    @endif
+</script>
+@endpush

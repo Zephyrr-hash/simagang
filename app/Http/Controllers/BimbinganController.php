@@ -87,12 +87,11 @@ class BimbinganController extends BaseController
 
     public function index()
     {
-        $magang = Magang::join('mahasiswa', 'magang.mhs_id', '=', 'mahasiswa.id')
+        $magang = Magang::with(['lowongan.mitra', 'dosen'])
+            ->join('mahasiswa', 'magang.mhs_id', '=', 'mahasiswa.id')
             ->where('mahasiswa.user_id', Auth::id())
             ->select('magang.*')
             ->first();
-
-        $low = $magang?->lowongan()->with(['mitra', 'dosen'])->first();
 
         $bimbingan = Bimbingan::join('magang', 'bimbingan.magang_id', '=', 'magang.id')
             ->join('mahasiswa', 'magang.mhs_id', '=', 'mahasiswa.id')
@@ -102,7 +101,7 @@ class BimbinganController extends BaseController
             ->get();
 
         $authProfile = $this->getAuthProfile();
-        return view('mhs.bimbingan.index', compact('bimbingan', 'low', 'magang', 'authProfile'));
+        return view('mhs.bimbingan.index', compact('bimbingan', 'magang', 'authProfile'));
     }
 
     public function create()

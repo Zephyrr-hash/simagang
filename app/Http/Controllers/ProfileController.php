@@ -6,8 +6,10 @@ use App\Models\Departemen;
 use App\Models\Dosen;
 use App\Models\Jurusan;
 use App\Models\Kabupaten;
+use App\Models\Kecamatan;
 use App\Models\Mahasiswa;
 use App\Models\Mitra;
+use App\Models\Provinsi;
 use App\Models\Role;
 use App\Models\Skill;
 use App\Models\SkillMhs;
@@ -16,6 +18,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class ProfileController extends BaseController
@@ -54,29 +58,46 @@ class ProfileController extends BaseController
 
         switch ((int) $user->role_id) {
             case Role::DEPARTEMEN:
-                $profile = Departemen::where('user_id', $user->id)->first();
+                // firstOrCreate agar akun baru yang belum punya profil bisa langsung edit
+                $profile = Departemen::firstOrCreate(['user_id' => $user->id]);
                 return view('depart.profile.edit', compact('profile', 'authProfile'));
             case Role::MITRA:
-                $profile    = Mitra::where('user_id', $user->id)->first();
-                $kabupatens = Kabupaten::orderBy('nama')->get();
-                return view('mitra.profile.edit', compact('profile', 'kabupatens', 'authProfile'));
+                $profile    = Mitra::firstOrCreate(['user_id' => $user->id]);
+                $provinsis  = Provinsi::orderBy('nama')->get();
+                $kabupatens = $profile->provinsi_id
+                    ? Kabupaten::where('provinsi_id', $profile->provinsi_id)->orderBy('nama')->get()
+                    : Kabupaten::orderBy('nama')->get();
+                $kecamatans = $profile->kab_id
+                    ? Kecamatan::where('kabupaten_id', $profile->kab_id)->orderBy('nama')->get()
+                    : collect();
+                return view('mitra.profile.edit', compact('profile', 'provinsis', 'kabupatens', 'kecamatans', 'authProfile'));
             case Role::DOSPEM:
-                $profile    = Dosen::where('user_id', $user->id)->first();
+                $profile     = Dosen::firstOrCreate(['user_id' => $user->id]);
                 $departemens = Departemen::orderBy('nama_depart')->get();
                 return view('dosen.profile.edit', compact('profile', 'departemens', 'authProfile'));
             case Role::SUPERVISOR:
-                $profile = Supervisor::where('user_id', $user->id)->first();
+                $profile = Supervisor::firstOrCreate(['user_id' => $user->id]);
                 $mitras  = Mitra::orderBy('nama_mitra')->get();
                 return view('spv.profile.edit', compact('profile', 'mitras', 'authProfile'));
             case Role::MAHASISWA:
-                $profile   = Mahasiswa::where('user_id', $user->id)->first();
-                $jurusans  = Jurusan::orderBy('jurusan')->get();
-                $skills    = Skill::orderBy('skill')->get();
+                $profile = Mahasiswa::firstOrCreate(['user_id' => $user->id]);
+
+                // Validasi ownership — pastikan user hanya bisa edit profil sendiri
+                if ((int)$profile->id !== (int)$id) {
+                    Log::warning('Unauthorized profile edit attempt', [
+                        'user_id' => $user->id,
+                        'requested_id' => $id,
+                        'actual_profile_id' => $profile->id,
+                    ]);
+                    return redirect()->route('profile.index')
+                        ->with('error', 'Anda tidak memiliki akses untuk mengubah profil ini.');
+                }
+
+                $jurusans    = Jurusan::orderBy('jurusan')->get();
+                $skills      = Skill::orderBy('skill')->get();
                 $departemens = Departemen::orderBy('nama_depart')->get();
-                $skillMhsIds = $profile
-                    ? SkillMhs::where('mhs_id', $profile->id)->pluck('skill_id')->toArray()
-                    : [];
-                $genders = ['Laki-laki', 'Perempuan'];
+                $skillMhsIds = SkillMhs::where('mhs_id', $profile->id)->pluck('skill_id')->toArray();
+                $genders     = ['Laki-laki', 'Perempuan'];
                 return view('mhs.profile.edit', compact('profile', 'jurusans', 'skills', 'departemens', 'skillMhsIds', 'genders', 'authProfile'));
         }
 
@@ -118,13 +139,18 @@ class ProfileController extends BaseController
                     'alamat_mitra'  => 'required|string',
                     'telepon_mitra' => 'required|string|max:20',
                     'fax_mitra'     => 'nullable|string|max:20',
+                    'provinsi_id'   => 'nullable|integer|exists:provinsi,id',
                     'kab_id'        => 'required|integer|exists:kabupaten,id',
+                    'kecamatan_id'  => 'nullable|integer|exists:kecamatan,id',
+                    'kode_pos'      => 'nullable|string|max:10|regex:/^[0-9]{5}$/',
                     'foto_mitra'    => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+                ], [
+                    'kode_pos.regex' => 'Kode pos harus berupa 5 digit angka.',
                 ]);
                 if ($validator->fails()) {
                     return redirect()->back()->with('errorForm', $validator->errors()->getMessages())->withInput();
                 }
-                $data = $request->only(['nama_mitra', 'alamat_mitra', 'telepon_mitra', 'fax_mitra', 'kab_id']);
+                $data = $request->only(['nama_mitra', 'alamat_mitra', 'telepon_mitra', 'fax_mitra', 'kab_id', 'provinsi_id', 'kecamatan_id', 'kode_pos']);
                 if ($request->hasFile('foto_mitra')) {
                     $this->deleteOldPhoto($profile->foto_mitra);
                     $data['foto_mitra'] = $this->uploadPhoto($request->file('foto_mitra'));
@@ -177,6 +203,18 @@ class ProfileController extends BaseController
 
             case Role::MAHASISWA:
                 $profile   = Mahasiswa::where('user_id', $userId)->firstOrFail();
+                
+                // Unauthorized check untuk edit profile orang lain
+                if ((int)$profile->id !== (int)$id) {
+                    Log::warning('Unauthorized profile update attempt', [
+                        'user_id' => Auth::id(),
+                        'requested_id' => $id,
+                        'actual_profile_id' => $profile->id
+                    ]);
+                    return redirect()->route('profile.index')
+                        ->with('error', 'Anda tidak memiliki akses untuk mengubah profil ini.');
+                }
+                
                 $validator = Validator::make($request->all(), [
                     'nama_mhs'     => 'required|string|max:255',
                     'NIM'          => 'required|string|max:20',
@@ -191,25 +229,50 @@ class ProfileController extends BaseController
                     'skill_id.*'   => 'integer|exists:skill,id',
                 ]);
                 if ($validator->fails()) {
+                    Log::info('Profile update validation failed', [
+                        'user_id' => Auth::id(),
+                        'errors' => $validator->errors()->toArray()
+                    ]);
                     return redirect()->back()->with('errorForm', $validator->errors()->getMessages())->withInput();
                 }
 
-                // Sync skill — delete lama, insert baru
-                SkillMhs::where('mhs_id', $profile->id)->delete();
-                if ($request->has('skill_id') && is_array($request->skill_id)) {
-                    foreach ($request->skill_id as $skillId) {
-                        SkillMhs::create(['skill_id' => $skillId, 'mhs_id' => $profile->id]);
+                try {
+                    DB::beginTransaction();
+                    
+                    // Sync skill — delete lama, insert baru
+                    SkillMhs::where('mhs_id', $profile->id)->delete();
+                    if ($request->has('skill_id') && is_array($request->skill_id)) {
+                        foreach ($request->skill_id as $skillId) {
+                            SkillMhs::create(['skill_id' => $skillId, 'mhs_id' => $profile->id]);
+                        }
                     }
-                }
 
-                $data = $request->only(['nama_mhs', 'NIM', 'telepon_mhs', 'pengalaman', 'jurusan_id', 'jenis_kelamin', 'tgl_lahir', 'depart_id']);
-                if ($request->hasFile('foto_mhs')) {
-                    $this->deleteOldPhoto($profile->foto_mhs);
-                    $data['foto_mhs'] = $this->uploadPhoto($request->file('foto_mhs'));
+                    $data = $request->only(['nama_mhs', 'NIM', 'telepon_mhs', 'pengalaman', 'jurusan_id', 'jenis_kelamin', 'tgl_lahir', 'depart_id']);
+                    if ($request->hasFile('foto_mhs')) {
+                        $this->deleteOldPhoto($profile->foto_mhs);
+                        $data['foto_mhs'] = $this->uploadPhoto($request->file('foto_mhs'));
+                    }
+                    $profile->update($data);
+                    User::where('id', $userId)->update(['name' => $request->nama_mhs]);
+                    
+                    DB::commit();
+                    
+                    Log::info('Profile mahasiswa updated successfully', [
+                        'user_id' => Auth::id(),
+                        'mahasiswa_id' => $profile->id
+                    ]);
+                    
+                    return redirect()->route('profile.index')->with('success', 'Profil berhasil diubah!');
+                } catch (\Exception $e) {
+                    DB::rollBack();
+                    Log::error('Profile mahasiswa update failed', [
+                        'user_id' => Auth::id(),
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    return redirect()->back()->withInput()
+                        ->with('error', 'Terjadi kesalahan saat menyimpan profil: ' . $e->getMessage());
                 }
-                $profile->update($data);
-                User::where('id', $userId)->update(['name' => $request->nama_mhs]);
-                return redirect()->route('profile.index')->with('success', 'Profil berhasil diubah!');
         }
 
         return redirect()->route('profile.index')->with('error', 'Role tidak dikenali.');
@@ -234,7 +297,26 @@ class ProfileController extends BaseController
         }
     }
 
-    public function create()  { /* */ }
+    public function create(): mixed
+    {
+        $user = Auth::user();
+
+        // Buat record profil kosong jika belum ada, lalu arahkan ke form edit
+        $profile = match ((int) $user->role_id) {
+            Role::DEPARTEMEN => Departemen::firstOrCreate(['user_id' => $user->id]),
+            Role::MITRA      => Mitra::firstOrCreate(['user_id' => $user->id]),
+            Role::DOSPEM     => Dosen::firstOrCreate(['user_id' => $user->id]),
+            Role::SUPERVISOR => Supervisor::firstOrCreate(['user_id' => $user->id]),
+            Role::MAHASISWA  => Mahasiswa::firstOrCreate(['user_id' => $user->id]),
+            default          => null,
+        };
+
+        if (!$profile) {
+            return redirect()->route('login');
+        }
+
+        return redirect()->route('profile.edit', $profile->id);
+    }
     public function store(Request $request) { /* */ }
     public function show($id) { /* */ }
     public function destroy($id) { /* */ }

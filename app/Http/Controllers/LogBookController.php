@@ -24,7 +24,8 @@ class LogBookController extends BaseController
             ->join('supervisor', 'magang.spv_id', '=', 'supervisor.id')
             ->where('supervisor.user_id', Auth::id())
             ->where('magang.approval', '!=', Magang::DITOLAK)
-            ->select('mahasiswa.*', 'mahasiswa.id as mhs_id', 'magang.approval', 'magang.id as magang_id')
+            ->leftJoin('lowongan', 'magang.lowongan_id', '=', 'lowongan.id')
+            ->select('mahasiswa.*', 'mahasiswa.id as mhs_id', 'magang.approval', 'magang.id as magang_id', 'lowongan.nama_low')
             ->orderBy('magang.approval', 'asc')
             ->get();
         $authProfile = $this->getAuthProfile();
@@ -39,9 +40,10 @@ class LogBookController extends BaseController
             ->select('logbook.*')
             ->orderBy('logbook.tanggal', 'asc')
             ->get();
+        $mag   = Magang::with(['lowongan.mitra', 'dosen'])->where('mhs_id', $id)->first();
         $skill = SkillMhs::with('skill')->where('mhs_id', $mhs->id)->get();
         $authProfile = $this->getAuthProfile();
-        return view('spv.logbook.show', compact('data', 'mhs', 'skill', 'authProfile'));
+        return view('spv.logbook.show', compact('data', 'mhs', 'mag', 'skill', 'authProfile'));
     }
 
     /** Supervisor memberikan catatan pada entri logbook */
@@ -88,27 +90,45 @@ class LogBookController extends BaseController
 
     public function index()
     {
-        $magang = Magang::with(['lowongan.mitra'])
+        $magang = Magang::with(['lowongan.mitra', 'dosen', 'spv'])
             ->join('mahasiswa', 'magang.mhs_id', '=', 'mahasiswa.id')
             ->where('mahasiswa.user_id', Auth::id())
             ->select('magang.*')
             ->first();
 
-        $logs = Logbook::join('magang', 'logbook.magang_id', '=', 'magang.id')
+        $logs = Logbook::with('project')
+            ->join('magang', 'logbook.magang_id', '=', 'magang.id')
             ->join('mahasiswa', 'magang.mhs_id', '=', 'mahasiswa.id')
             ->where('mahasiswa.user_id', Auth::id())
             ->select('logbook.*')
             ->orderBy('logbook.tanggal', 'desc')
             ->get();
 
+        // Load project yang terkait magang mahasiswa ini
+        $projects = $magang
+            ? \App\Models\ProjectMagang::where('magang_id', $magang->id)
+                ->orderBy('status')->orderBy('nama_project')->get()
+            : collect();
+
         $authProfile = $this->getAuthProfile();
-        return view('mhs.logbook.index', compact('logs', 'magang', 'authProfile'));
+        return view('mhs.logbook.index', compact('logs', 'magang', 'projects', 'authProfile'));
     }
 
     public function create()
     {
+        $magang = Magang::join('mahasiswa', 'magang.mhs_id', '=', 'mahasiswa.id')
+            ->where('mahasiswa.user_id', Auth::id())
+            ->select('magang.*')
+            ->first();
+
+        $projects = $magang
+            ? \App\Models\ProjectMagang::where('magang_id', $magang->id)
+                ->where('status', '!=', 'selesai')
+                ->orderBy('nama_project')->get()
+            : collect();
+
         $authProfile = $this->getAuthProfile();
-        return view('mhs.logbook.create', compact('authProfile'));
+        return view('mhs.logbook.create', compact('projects', 'authProfile'));
     }
 
     public function store(Request $request)
@@ -127,6 +147,7 @@ class LogBookController extends BaseController
             'kegiatan'    => 'required|string|max:255',
             'deskripsi_log' => 'required|string',
             'saran'       => 'required|string',
+            'project_id'  => 'nullable|integer|exists:project_magang,id',
         ]);
 
         if ($validator->fails()) {
@@ -140,6 +161,7 @@ class LogBookController extends BaseController
                 'deskripsi_log' => $request->deskripsi_log,
                 'saran'       => $request->saran,
                 'magang_id'   => $magang->mag_id,
+                'project_id'  => $request->project_id ?: null,
             ]);
             return redirect()->route('logbook.index')->with('success', 'Aktivitas berhasil ditambahkan!');
         } catch (\Exception $e) {

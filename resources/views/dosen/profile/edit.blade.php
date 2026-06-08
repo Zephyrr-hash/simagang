@@ -36,9 +36,9 @@
     </div>
     <div class="form-card-body">
         @if(session('errorForm'))
-        <div class="error-alert"><strong>Terdapat kesalahan:</strong><ul>@foreach(session('errorForm') as $msgs)@foreach($msgs as $m)<li>{{ $m }}</li>@endforeach@endforeach</ul></div>
+        <div class="error-alert"><strong>Terdapat kesalahan:</strong><ul>@foreach(session('errorForm') as $msgs)@foreach($msgs as $m)<li>{{ $m }}</li>@endforeach @endforeach</ul></div>
         @endif
-        <form action="{{ route('profile.update', 1) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('profile.update', $profile->id) }}" method="POST" enctype="multipart/form-data">
             @csrf @method('PUT')
             <div class="form-group">
                 <label class="form-label">Nama Lengkap <span class="req">*</span></label>

@@ -43,4 +43,9 @@ class Magang extends Model
     public function logbook(){
         return $this->hasMany(Logbook::class);
     }
+
+    public function project(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ProjectMagang::class, 'magang_id');
+    }
 }

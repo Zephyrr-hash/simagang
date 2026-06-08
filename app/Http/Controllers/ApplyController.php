@@ -91,7 +91,17 @@ class ApplyController extends BaseController
     public function detail($id)
     {
         $low = Lowongan::join('mitra', 'lowongan.mitra_id', '=', 'mitra.id')
-            ->select('mitra.*', 'lowongan.*')
+            ->leftJoin('kabupaten', 'mitra.kab_id', '=', 'kabupaten.id')
+            ->leftJoin('kecamatan', 'mitra.kecamatan_id', '=', 'kecamatan.id')
+            ->leftJoin('provinsi', 'mitra.provinsi_id', '=', 'provinsi.id')
+            ->select(
+                'lowongan.*',
+                'mitra.*',
+                'lowongan.id as id',
+                'kabupaten.nama as nama_kabupaten',
+                'kecamatan.nama as nama_kecamatan',
+                'provinsi.nama as nama_provinsi'
+            )
             ->find($id);
 
         $mhs = Mahasiswa::where('user_id', Auth::id())->first();

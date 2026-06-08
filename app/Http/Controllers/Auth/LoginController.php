@@ -57,6 +57,9 @@ class LoginController extends Controller
 
         $credentials = request(['email', 'password']);
         if (Auth::attempt($credentials)) {
+            // Regenerate session untuk mencegah session fixation & 419 PAGE EXPIRED
+            $request->session()->regenerate();
+
             $user = $request->user();
             if ($user->role_id == Role::DEPARTEMEN) {
                 return redirect()->route('depart.home');

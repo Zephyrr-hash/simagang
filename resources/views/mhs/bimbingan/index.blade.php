@@ -43,12 +43,45 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
 
 @if($magang)
 <div class="info-banner">
-    <strong>Magang aktif:</strong> {{ $magang->lowongan?->nama_low ?? '—' }}
-    @if($magang->dosen_id)
-        &bull; Dosen Pembimbing: <strong>{{ $magang->dosen?->nama_dosen ?? '—' }}</strong>
-    @else
-        &bull; <span style="color:#D97706;">Dosen pembimbing belum ditugaskan.</span>
-    @endif
+    <div style="display:flex;flex-wrap:wrap;gap:0.5rem 1.5rem;align-items:center;">
+        <span>
+            <strong>Lowongan:</strong> {{ $magang->lowongan?->nama_low ?? '—' }}
+        </span>
+        <span style="color:#6B7280;">|</span>
+        <span>
+            <strong>Perusahaan:</strong> {{ $magang->lowongan?->mitra?->nama_mitra ?? '—' }}
+        </span>
+        @if($magang->tgl_mulai)
+        <span style="color:#6B7280;">|</span>
+        <span>
+            <strong>Periode:</strong>
+            {{ \Carbon\Carbon::parse($magang->tgl_mulai)->format('d/m/Y') }}
+            &ndash;
+            {{ $magang->tgl_selesai ? \Carbon\Carbon::parse($magang->tgl_selesai)->format('d/m/Y') : 'Sekarang' }}
+        </span>
+        @endif
+        @if($magang->lowongan?->lokasi)
+        <span style="color:#6B7280;">|</span>
+        <span><strong>Lokasi:</strong> {{ $magang->lowongan->lokasi }}</span>
+        @endif
+    </div>
+    <div style="margin-top:0.5rem;padding-top:0.5rem;border-top:1px solid #BFDBFE;">
+        @if($magang->dosen)
+            <span>
+                <strong>Dosen Pembimbing:</strong>
+                {{ $magang->dosen->nama_dosen }}
+                &mdash; <span style="opacity:0.8;">NIP: {{ $magang->dosen->NIP ?? '—' }}</span>
+                @if($magang->dosen->telepon_dosen)
+                &mdash; <span style="opacity:0.8;">{{ $magang->dosen->telepon_dosen }}</span>
+                @endif
+            </span>
+        @else
+            <span style="color:#D97706;">
+                <svg xmlns="http://www.w3.org/2000/svg" style="width:14px;height:14px;vertical-align:-2px;" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/></svg>
+                Dosen pembimbing belum ditugaskan.
+            </span>
+        @endif
+    </div>
 </div>
 @endif
 

@@ -48,7 +48,7 @@
                 <p class="mhs-low">{{ $item->nama_low ?? 'Lowongan tidak diketahui' }}</p>
             </div>
         </div>
-        <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #F3F4F6;">
+        <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid #F3F4F6;display:flex;align-items:center;justify-content:space-between;">
             <x-badge-status :status="$item->approval" />
         </div>
         <a href="{{ route('spv.logbook', $item->mhs_id) }}" class="btn-review">Lihat Logbook</a>

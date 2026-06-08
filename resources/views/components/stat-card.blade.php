@@ -40,6 +40,8 @@
         transition: box-shadow 0.2s ease, transform 0.2s ease;
         text-decoration: none;
         color: inherit;
+        width: 100%;
+        min-height: 100px;
     }
 
     .stat-card:hover {

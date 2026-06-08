@@ -21,7 +21,7 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 1rem;
         margin-bottom: 1.75rem;
-        max-width: 640px;
+        width: 100%;
     }
     @media (max-width: 575px) { .stats-grid { grid-template-columns: 1fr; } }
 

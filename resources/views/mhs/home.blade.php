@@ -25,6 +25,7 @@
         gap: 1rem;
         margin-bottom: 1.75rem;
         border: 1px solid transparent;
+        width: 100%;
     }
     .status-banner.status-1 { background: #EFF6FF; border-color: #BFDBFE; color: #1E40AF; }
     .status-banner.status-2 { background: #ECFDF5; border-color: #A7F3D0; color: #065F46; }
@@ -43,14 +44,15 @@
     }
     .status-banner-action:hover { opacity: 0.75; }
 
-    /* Stats Grid */
+    /* Stats Grid — Full Width */
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
         margin-bottom: 1.75rem;
+        width: 100%;
     }
-    @media (max-width: 767px) { .stats-grid { grid-template-columns: 1fr; } }
+    @media (max-width: 767px) { .stats-grid { grid-template-columns: 1fr; gap: 1rem; } }
 
     /* Profile incomplete warning */
     .profile-warning {
@@ -64,6 +66,7 @@
         font-size: 0.875rem;
         color: #92400E;
         margin-bottom: 1.75rem;
+        width: 100%;
     }
     .profile-warning a { color: #92400E; font-weight: 700; }
     .profile-warning svg { flex-shrink: 0; width: 20px; height: 20px; }

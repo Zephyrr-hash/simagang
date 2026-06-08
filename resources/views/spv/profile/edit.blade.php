@@ -9,7 +9,7 @@
 @endsection
 @push('styles')
 <style>
-.form-card{background:#fff;border:1px solid #E0E7FF;border-radius:14px;overflow:hidden;max-width:640px;}
+.form-card{background:#fff;border:1px solid #E0E7FF;border-radius:14px;overflow:hidden;width:100%;max-width:none;}
 .form-card-header{background:linear-gradient(135deg,#4F46E5,#7C3AED);padding:1.25rem 1.75rem;color:#fff;}
 .form-card-header h1{font-size:1.1rem;font-weight:700;margin:0 0 0.2rem;}
 .form-card-header p{font-size:0.82rem;opacity:0.85;margin:0;}
@@ -36,9 +36,9 @@
     </div>
     <div class="form-card-body">
         @if(session('errorForm'))
-        <div class="error-alert"><strong>Terdapat kesalahan:</strong><ul>@foreach(session('errorForm') as $msgs)@foreach($msgs as $m)<li>{{ $m }}</li>@endforeach@endforeach</ul></div>
+        <div class="error-alert"><strong>Terdapat kesalahan:</strong><ul>@foreach(session('errorForm') as $msgs)@foreach($msgs as $m)<li>{{ $m }}</li>@endforeach @endforeach</ul></div>
         @endif
-        <form action="{{ route('profile.update', 1) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('profile.update', $profile->id) }}" method="POST" enctype="multipart/form-data">
             @csrf @method('PUT')
             <div class="form-group">
                 <label class="form-label">Nama Lengkap <span class="req">*</span></label>
