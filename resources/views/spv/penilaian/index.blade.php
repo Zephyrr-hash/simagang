@@ -58,6 +58,12 @@
             <div>
                 <p class="mhs-name">{{ $item->mahasiswa?->nama_mhs ?? '—' }}</p>
                 <p class="mhs-low">{{ $item->lowongan?->nama_low ?? '—' }}</p>
+                @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
+                <p class="mhs-low" style="color:#059669;">
+                    🏢 {{ $item->lowongan?->mitra?->nama_mitra ?? '—' }}
+                    @if($item->spv) · 👷 {{ $item->spv?->nama_spv }} @endif
+                </p>
+                @endif
             </div>
         </div>
 

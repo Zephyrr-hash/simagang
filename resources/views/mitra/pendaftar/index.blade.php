@@ -33,7 +33,11 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
     <div style="overflow-x:auto;">
         <table>
             <thead>
-                <tr><th>#</th><th>Nama Mahasiswa</th><th>Lowongan</th><th>Tanggal Daftar</th><th>Aksi</th></tr>
+                <tr><th>#</th><th>Nama Mahasiswa</th><th>Lowongan</th>
+                @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
+                <th>Perusahaan Mitra</th>
+                @endif
+                <th>Tanggal Daftar</th><th>Aksi</th></tr>
             </thead>
             <tbody>
                 @forelse($data as $i => $item)
@@ -41,11 +45,14 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
                     <td style="color:#9CA3AF;font-size:0.8rem;">{{ $i + 1 }}</td>
                     <td style="font-weight:600;color:#1E1B4B;">{{ $item->mahasiswa?->nama_mhs ?? '—' }}</td>
                     <td>{{ $item->lowongan?->nama_low ?? '—' }}</td>
+                    @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
+                    <td style="font-size:0.8rem;color:#6B7280;">{{ $item->lowongan?->mitra?->nama_mitra ?? '—' }}</td>
+                    @endif
                     <td>{{ $item->created_at?->format('d/m/Y') ?? '—' }}</td>
                     <td><a href="{{ route('pendaftar.edit', $item->id) }}" class="btn-review">Review</a></td>
                 </tr>
                 @empty
-                <tr><td colspan="5"><div class="empty-state"><p>Tidak ada pendaftar baru saat ini.</p></div></td></tr>
+                <tr><td colspan="{{ Auth::user()->role_id == \App\Models\Role::SUPERADMIN ? 6 : 5 }}"><div class="empty-state"><p>Tidak ada pendaftar baru saat ini.</p></div></td></tr>
                 @endforelse
             </tbody>
         </table>

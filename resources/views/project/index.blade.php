@@ -80,6 +80,10 @@
                 {{ $p->magang?->mahasiswa?->nama_mhs ?? '—' }}
                 <span style="color:#D1D5DB;">·</span>
                 {{ $p->magang?->lowongan?->mitra?->nama_mitra ?? '—' }}
+                @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN && $p->magang?->spv)
+                <span style="color:#D1D5DB;">·</span>
+                <span style="color:#16A34A;">👷 {{ $p->magang?->spv?->nama_spv }}</span>
+                @endif
             </p>
             @if($p->teknologi)
             <span class="proj-tech">{{ $p->teknologi }}</span>

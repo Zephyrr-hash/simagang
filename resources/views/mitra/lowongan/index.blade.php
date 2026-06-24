@@ -59,6 +59,11 @@
         @endif
         <div class="low-card-body">
             @if($item->kategori)<span class="low-card-badge">{{ $item->kategori->kategori }}</span>@endif
+            @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN && $item->mitra)
+            <span class="low-card-badge" style="background:#ECFDF5;color:#059669;margin-left:4px;">
+                🏢 {{ $item->mitra->nama_mitra }}
+            </span>
+            @endif
             <h3 class="low-card-title">{{ $item->nama_low }}</h3>
             <p class="low-card-meta">📍 {{ $item->lokasi }} &bull; ⏱ {{ $item->durasi }} bulan</p>
             <div class="low-card-kuota {{ $item->jumlah_mhs == 0 ? 'full' : '' }}">

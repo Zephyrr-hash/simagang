@@ -35,7 +35,11 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
     <div style="overflow-x:auto;">
         <table>
             <thead>
-                <tr><th>#</th><th>Nama Mahasiswa</th><th>Lowongan</th><th>Tgl Mulai</th><th>Tgl Selesai</th><th>Status</th><th>Aksi</th></tr>
+                <tr><th>#</th><th>Nama Mahasiswa</th><th>Lowongan</th>
+                @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
+                <th>Perusahaan Mitra</th>
+                @endif
+                <th>Tgl Mulai</th><th>Tgl Selesai</th><th>Status</th><th>Aksi</th></tr>
             </thead>
             <tbody>
                 @forelse($data as $i => $item)
@@ -43,6 +47,9 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
                     <td style="color:#9CA3AF;font-size:0.8rem;">{{ $i + 1 }}</td>
                     <td style="font-weight:600;color:#1E1B4B;">{{ $item->mahasiswa?->nama_mhs ?? '—' }}</td>
                     <td>{{ $item->lowongan?->nama_low ?? '—' }}</td>
+                    @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
+                    <td style="font-size:0.8rem;color:#6B7280;">{{ $item->lowongan?->mitra?->nama_mitra ?? '—' }}</td>
+                    @endif
                     <td>{{ $item->tgl_mulai ? \Carbon\Carbon::parse($item->tgl_mulai)->format('d/m/Y') : '—' }}</td>
                     <td>{{ $item->tgl_selesai ? \Carbon\Carbon::parse($item->tgl_selesai)->format('d/m/Y') : '—' }}</td>
                     <td><x-badge-status :status="$item->approval" /></td>
@@ -59,7 +66,7 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
                     </td>
                 </tr>
                 @empty
-                <tr><td colspan="7"><div class="empty-state"><p>Belum ada mahasiswa magang.</p></div></td></tr>
+                <tr><td colspan="{{ Auth::user()->role_id == \App\Models\Role::SUPERADMIN ? 8 : 7 }}"><div class="empty-state"><p>Belum ada mahasiswa magang.</p></div></td></tr>
                 @endforelse
             </tbody>
         </table>

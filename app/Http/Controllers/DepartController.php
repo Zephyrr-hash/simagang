@@ -37,10 +37,11 @@ class DepartController extends BaseController
 
         // Superadmin melihat semua mahasiswa, Departemen hanya miliknya
         if ($isSuperadmin) {
-            $mhs = Mahasiswa::with('status')->orderBy('status_id', 'asc')->get();
+            $mhs = Mahasiswa::with(['status', 'jurusan', 'user.creator'])
+                ->orderBy('status_id', 'asc')->get();
         } else {
             $depart = Departemen::where('user_id', Auth::id())->firstOrFail();
-            $mhs = Mahasiswa::with('status')
+            $mhs = Mahasiswa::with(['status', 'jurusan', 'user.creator'])
                 ->where('depart_id', $depart->id)
                 ->orderBy('status_id', 'asc')
                 ->get();

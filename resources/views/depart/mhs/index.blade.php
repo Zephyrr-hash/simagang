@@ -38,7 +38,11 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
     <div style="overflow-x:auto;">
         <table>
             <thead>
-                <tr><th>#</th><th>Nama</th><th>NIM</th><th>Jurusan</th><th>Status</th><th>Aksi</th></tr>
+                <tr><th>#</th><th>Nama</th><th>NIM</th><th>Jurusan</th><th>Status</th>
+                @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
+                <th>Dibuat Oleh</th>
+                @endif
+                <th>Aksi</th></tr>
             </thead>
             <tbody>
                 @forelse($mhs as $i => $item)
@@ -53,10 +57,13 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
                             {{ $statusLabels[$item->status_id] ?? '—' }}
                         </span>
                     </td>
+                    @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
+                    <td style="font-size:0.8rem;color:#6B7280;">{{ $item->user?->creator?->name ?? '—' }}</td>
+                    @endif
                     <td><a href="{{ route('depart.detailMhs', $item->id) }}" class="btn-detail">Detail</a></td>
                 </tr>
                 @empty
-                <tr><td colspan="6"><div class="empty-state"><p>Belum ada mahasiswa terdaftar.</p></div></td></tr>
+                <tr><td colspan="{{ Auth::user()->role_id == \App\Models\Role::SUPERADMIN ? 7 : 6 }}"><div class="empty-state"><p>Belum ada mahasiswa terdaftar.</p></div></td></tr>
                 @endforelse
             </tbody>
         </table>

@@ -26,7 +26,7 @@ class ApplyController extends BaseController
         $authProfile = $this->getAuthProfile();
         $isSuperadmin = (int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN;
 
-        $query = Magang::with(['mahasiswa', 'lowongan'])
+        $query = Magang::with(['mahasiswa', 'lowongan.mitra', 'spv'])
             ->where('approval', Magang::SELESAI)
             ->select('magang.*', 'magang.id as mag_id');
 
@@ -184,7 +184,7 @@ class ApplyController extends BaseController
         $authProfile  = $this->getAuthProfile();
         $isSuperadmin = (int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN;
 
-        $query = Magang::with(['mahasiswa', 'lowongan.mitra'])
+        $query = Magang::with(['mahasiswa.departemen', 'lowongan.mitra'])
             ->join('mahasiswa', 'magang.mhs_id', '=', 'mahasiswa.id')
             ->whereNull('magang.dosen_id')
             ->select('magang.*');
@@ -260,7 +260,7 @@ class ApplyController extends BaseController
         $authProfile  = $this->getAuthProfile();
         $isSuperadmin = (int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN;
 
-        $query = Magang::with(['mahasiswa', 'lowongan'])
+        $query = Magang::with(['mahasiswa', 'lowongan.mitra'])
             ->join('lowongan', 'magang.lowongan_id', '=', 'lowongan.id')
             ->join('mitra', 'lowongan.mitra_id', '=', 'mitra.id')
             ->where('magang.approval', Magang::PENDING)
@@ -356,7 +356,7 @@ class ApplyController extends BaseController
         $authProfile  = $this->getAuthProfile();
         $isSuperadmin = (int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN;
 
-        $query = Magang::with(['mahasiswa', 'lowongan', 'spv'])
+        $query = Magang::with(['mahasiswa', 'lowongan.mitra', 'spv'])
             ->join('lowongan', 'magang.lowongan_id', '=', 'lowongan.id')
             ->join('mitra', 'lowongan.mitra_id', '=', 'mitra.id')
             ->where('magang.approval', '!=', Magang::DITOLAK)

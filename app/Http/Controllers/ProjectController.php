@@ -92,7 +92,7 @@ class ProjectController extends BaseController
             })(),
 
             // Superadmin melihat semua project
-            Role::SUPERADMIN => $query->orderBy('created_at', 'desc')->get(),
+            Role::SUPERADMIN => $query->with(['magang.spv'])->orderBy('created_at', 'desc')->get(),
 
             default => collect(),
         };
