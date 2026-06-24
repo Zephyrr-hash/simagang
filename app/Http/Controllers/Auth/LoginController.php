@@ -75,6 +75,8 @@ class LoginController extends Controller
                 return redirect()->route('supervisor.home');
             } elseif ($user->role_id == Role::MAHASISWA) {
                 return redirect()->route('mahasiswa.home');
+            } elseif ($user->role_id == Role::SUPERADMIN) {
+                return redirect()->route('superadmin.home');
             }
         }
         return back()->with('error', 'Alamat email dan password tidak sesuai!');

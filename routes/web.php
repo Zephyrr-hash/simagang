@@ -128,5 +128,27 @@ Route::group(['middleware' => ['is_mahasiswa', 'profile_complete']], function ()
     Route::get('/redirect', fn() => view('mhs.redirect'))->name('redirect');
 });
 
+// =====================================================================
+// SUPERADMIN
+// =====================================================================
+Route::group(['middleware' => ['is_superadmin'], 'prefix' => 'superadmin', 'as' => 'superadmin.'], function () {
+    Route::get('home', [\App\Http\Controllers\SuperadminController::class, 'home'])->name('home');
+
+    // Kelola semua user
+    Route::get('users',              [\App\Http\Controllers\SuperadminController::class, 'userIndex'])->name('users.index');
+    Route::get('users/create',       [\App\Http\Controllers\SuperadminController::class, 'userCreate'])->name('users.create');
+    Route::post('users',             [\App\Http\Controllers\SuperadminController::class, 'userStore'])->name('users.store');
+    Route::get('users/{user}',       [\App\Http\Controllers\SuperadminController::class, 'userShow'])->name('users.show');
+    Route::get('users/{user}/edit',  [\App\Http\Controllers\SuperadminController::class, 'userEdit'])->name('users.edit');
+    Route::put('users/{user}',       [\App\Http\Controllers\SuperadminController::class, 'userUpdate'])->name('users.update');
+    Route::delete('users/{user}',    [\App\Http\Controllers\SuperadminController::class, 'userDestroy'])->name('users.destroy');
+
+    // Activity Logs (akses semua log, tanpa filter departemen)
+    Route::get('activity-logs',      [\App\Http\Controllers\ActivityLogController::class, 'indexAll'])->name('activity-logs.index');
+    Route::get('activity-logs/{id}', [\App\Http\Controllers\ActivityLogController::class, 'show'])->name('activity-logs.show');
+    Route::get('activity-logs-export', [\App\Http\Controllers\ActivityLogController::class, 'exportAll'])->name('activity-logs.export');
+    Route::post('activity-logs-clear', [\App\Http\Controllers\ActivityLogController::class, 'clearOld'])->name('activity-logs.clear');
+});
+
 Auth::routes(['register' => false]);
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

@@ -28,6 +28,7 @@ class BaseController extends Controller
             Role::DOSPEM     => Dosen::where('user_id', $user->id)->first(),
             Role::SUPERVISOR => Supervisor::where('user_id', $user->id)->first(),
             Role::MAHASISWA  => Mahasiswa::where('user_id', $user->id)->first(),
+            Role::SUPERADMIN => null,
             default          => null,
         };
 
@@ -39,7 +40,6 @@ class BaseController extends Controller
             Role::MAHASISWA  => ['foto_mhs',    'nama_mhs'],
             default          => [null, null],
         };
-
         $foto = ($fotoField !== null ? $profile?->$fotoField : null) ?? 'default.png';
         $nama = ($namaField !== null ? $profile?->$namaField : null) ?? $user->name;
 

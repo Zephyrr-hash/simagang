@@ -204,4 +204,89 @@ class ActivityLogController extends Controller
         
         return redirect()->back()->with('success', "Berhasil menghapus {$deleted} log aktivitas yang lebih dari {$days} hari.");
     }
+
+    /**
+     * Display ALL activity logs (Superadmin - tanpa filter departemen)
+     */
+    public function indexAll(Request $request)
+    {
+        $action    = $request->input('action');
+        $module    = $request->input('module');
+        $userId    = $request->input('user_id');
+        $startDate = $request->input('start_date');
+        $endDate   = $request->input('end_date');
+        $search    = $request->input('search');
+
+        $logs = ActivityLog::with('user')
+            ->when($action, fn($q) => $q->where('action', $action))
+            ->when($module, fn($q) => $q->where('module', $module))
+            ->when($userId, fn($q) => $q->where('user_id', $userId))
+            ->when($startDate && $endDate, fn($q) => $q->whereBetween('created_at', [
+                $startDate . ' 00:00:00',
+                $endDate . ' 23:59:59',
+            ]))
+            ->when($search, function ($q) use ($search) {
+                $q->where(function ($query) use ($search) {
+                    $query->where('description', 'like', "%{$search}%")
+                          ->orWhere('action', 'like', "%{$search}%")
+                          ->orWhere('module', 'like', "%{$search}%");
+                });
+            })
+            ->orderBy('created_at', 'desc')
+            ->paginate(20);
+
+        $actions = ActivityLog::select('action')->distinct()->orderBy('action')->pluck('action');
+        $modules = ActivityLog::select('module')->distinct()->orderBy('module')->pluck('module');
+        $users   = \App\Models\User::select('id', 'name', 'role_id')->orderBy('name')->get();
+        $stats   = $this->getStatistics($startDate, $endDate);
+
+        return view('superadmin.activity-logs.index', compact(
+            'logs', 'actions', 'modules', 'users', 'stats'
+        ));
+    }
+
+    /**
+     * Export ALL logs to CSV (Superadmin)
+     */
+    public function exportAll(Request $request)
+    {
+        $logs = ActivityLog::with('user')
+            ->when($request->action, fn($q) => $q->where('action', $request->action))
+            ->when($request->module, fn($q) => $q->where('module', $request->module))
+            ->when($request->user_id, fn($q) => $q->where('user_id', $request->user_id))
+            ->when($request->start_date && $request->end_date, fn($q) => $q->whereBetween('created_at', [
+                $request->start_date . ' 00:00:00',
+                $request->end_date . ' 23:59:59',
+            ]))
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $filename = 'all_activity_logs_' . date('Y-m-d_His') . '.csv';
+
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+        ];
+
+        $callback = function () use ($logs) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
+            fputcsv($file, ['No', 'Tanggal/Waktu', 'User', 'Role', 'Aksi', 'Module', 'Deskripsi', 'IP Address']);
+            foreach ($logs as $i => $log) {
+                fputcsv($file, [
+                    $i + 1,
+                    $log->created_at->format('d/m/Y H:i:s'),
+                    $log->user?->name ?? 'System',
+                    $log->role ?? '-',
+                    $log->action,
+                    $log->module,
+                    $log->description,
+                    $log->ip_address ?? '-',
+                ]);
+            }
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

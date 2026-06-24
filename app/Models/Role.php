@@ -14,6 +14,7 @@ class Role extends Model
     const DOSPEM     = 3;
     const SUPERVISOR = 4;
     const MAHASISWA  = 5;
+    const SUPERADMIN = 6;
 
     protected $table = 'role';
     protected $primaryKey = 'id';

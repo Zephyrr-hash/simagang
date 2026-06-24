@@ -44,6 +44,11 @@ class IsProfileComplete
         $user    = Auth::user();
         $roleId  = (int) $user->role_id;
 
+        // Superadmin tidak perlu pengecekan profil
+        if ($roleId === Role::SUPERADMIN) {
+            return $next($request);
+        }
+
         // Ambil profil berdasarkan role
         $profile = match ($roleId) {
             Role::DEPARTEMEN => Departemen::where('user_id', $user->id)->first(),
