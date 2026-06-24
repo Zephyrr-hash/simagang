@@ -102,6 +102,19 @@
         .sidebar::-webkit-scrollbar-track { background: transparent; }
         .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
 
+        /* Superadmin role dot divider */
+        .sidebar-nav-label {
+            font-size: 0.6875rem;
+            font-weight: 600;
+            color: rgba(255,255,255,0.35);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 0.5rem 0.5rem 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
         /* Logo area */
         .sidebar-logo {
             padding: 1.5rem 1.25rem 1rem;
@@ -193,15 +206,6 @@
         .sidebar-nav {
             padding: 0.5rem 0.75rem;
             flex: 1;
-        }
-
-        .sidebar-nav-label {
-            font-size: 0.6875rem;
-            font-weight: 600;
-            color: rgba(255,255,255,0.35);
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
-            padding: 0.5rem 0.5rem 0.25rem;
         }
 
         .sidebar-nav-item {
@@ -687,6 +691,9 @@
 
         {{-- SUPERADMIN (role 6) --}}
         @if($roleId === \App\Models\Role::SUPERADMIN)
+
+            {{-- ── Overview ─────────────────────────── --}}
+            <div class="sidebar-nav-label">Overview</div>
             <a href="{{ route('superadmin.home') }}"
                class="sidebar-nav-item {{ request()->routeIs('superadmin.home') ? 'active' : '' }}">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
@@ -699,7 +706,7 @@
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
                 </svg>
-                Kelola Semua User
+                Semua User
             </a>
             <a href="{{ route('superadmin.activity-logs.index') }}"
                class="sidebar-nav-item {{ request()->routeIs('superadmin.activity-logs.*') ? 'active' : '' }}">
@@ -708,6 +715,128 @@
                 </svg>
                 Log Aktivitas
             </a>
+
+            {{-- ── Departemen ──────────────────────────────── --}}
+            <div class="sidebar-nav-label" style="margin-top:.5rem;display:flex;align-items:center;gap:.4rem;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#7C3AED;flex-shrink:0;display:inline-block;"></span>Departemen
+            </div>
+            <a href="{{ route('depart.home') }}" class="sidebar-nav-item {{ request()->routeIs('depart.home') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="{{ route('users.index') }}" class="sidebar-nav-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 0 0 2.625.372 9.337 9.337 0 0 0 4.121-.952 4.125 4.125 0 0 0-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 0 1 8.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0 1 11.964-3.07M12 6.375a3.375 3.375 0 1 1-6.75 0 3.375 3.375 0 0 1 6.75 0Zm8.25 2.25a2.625 2.625 0 1 1-5.25 0 2.625 2.625 0 0 1 5.25 0Z" />
+                </svg>
+                Kelola User
+            </a>
+            <a href="{{ route('depart.mhs') }}" class="sidebar-nav-item {{ request()->routeIs('depart.mhs') || request()->routeIs('depart.detailMhs') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.438 60.438 0 0 0-.491 6.347A48.62 48.62 0 0 1 12 20.904a48.62 48.62 0 0 1 8.232-4.41 60.46 60.46 0 0 0-.491-6.347m-15.482 0a50.636 50.636 0 0 0-2.658-.813A59.906 59.906 0 0 1 12 3.493a59.903 59.903 0 0 1 10.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.717 50.717 0 0 1 12 13.489a50.702 50.702 0 0 1 3.741-3.342M6.75 15a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Zm0 0v-3.675A55.378 55.378 0 0 1 12 8.443m-7.007 11.55A5.981 5.981 0 0 0 6.75 15.75v-1.5" />
+                </svg>
+                Data Mahasiswa
+            </a>
+            <a href="{{ route('pengajuan.index') }}" class="sidebar-nav-item {{ request()->routeIs('pengajuan.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                </svg>
+                Pengajuan Dospem
+            </a>
+            <a href="{{ route('activity-logs.index') }}" class="sidebar-nav-item {{ request()->routeIs('activity-logs.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+                </svg>
+                Log Departemen
+            </a>
+
+            {{-- ── Mitra ────────────────────────────────── --}}
+            <div class="sidebar-nav-label" style="margin-top:.5rem;display:flex;align-items:center;gap:.4rem;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#059669;flex-shrink:0;display:inline-block;"></span>Mitra
+            </div>
+            <a href="{{ route('mitra.home') }}" class="sidebar-nav-item {{ request()->routeIs('mitra.home') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="{{ route('lowongan.index') }}" class="sidebar-nav-item {{ request()->routeIs('lowongan.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 0 0 .75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 0 0-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0 1 12 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 0 1-.673-.38m0 0A2.18 2.18 0 0 1 3 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 0 1 3.413-.387m7.5 0V5.25A2.25 2.25 0 0 0 13.5 3h-3a2.25 2.25 0 0 0-2.25 2.25v.894m7.5 0a48.667 48.667 0 0 0-7.5 0M12 12.75h.008v.008H12v-.008Z" />
+                </svg>
+                Kelola Lowongan
+            </a>
+            <a href="{{ route('pendaftar.index') }}" class="sidebar-nav-item {{ request()->routeIs('pendaftar.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z" />
+                </svg>
+                Pendaftar
+            </a>
+            <a href="{{ route('magang.index') }}" class="sidebar-nav-item {{ request()->routeIs('magang.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />
+                </svg>
+                Mahasiswa Magang
+            </a>
+
+            {{-- ── Dosen Pembimbing ─────────────────────── --}}
+            <div class="sidebar-nav-label" style="margin-top:.5rem;display:flex;align-items:center;gap:.4rem;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#2563EB;flex-shrink:0;display:inline-block;"></span>Dosen Pembimbing
+            </div>
+            <a href="{{ route('dospem.home') }}" class="sidebar-nav-item {{ request()->routeIs('dospem.home') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="{{ route('project.index') }}" class="sidebar-nav-item {{ request()->routeIs('project.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75 2.25 12l4.179 2.25m0-4.5 5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0 4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0-5.571 3-5.571-3" />
+                </svg>
+                Project & Bimbingan
+            </a>
+
+            {{-- ── Supervisor ───────────────────────────── --}}
+            <div class="sidebar-nav-label" style="margin-top:.5rem;display:flex;align-items:center;gap:.4rem;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#16A34A;flex-shrink:0;display:inline-block;"></span>Supervisor
+            </div>
+            <a href="{{ route('supervisor.home') }}" class="sidebar-nav-item {{ request()->routeIs('supervisor.home') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="{{ route('spv.penilaian') }}" class="sidebar-nav-item {{ request()->routeIs('spv.*') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 0 1 1.04 0l2.125 5.111a.563.563 0 0 0 .475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 0 0-.182.557l1.285 5.385a.562.562 0 0 1-.84.61l-4.725-2.885a.562.562 0 0 0-.586 0L6.982 20.54a.562.562 0 0 1-.84-.61l1.285-5.386a.562.562 0 0 0-.182-.557l-4.204-3.602a.562.562 0 0 1 .321-.988l5.518-.442a.563.563 0 0 0 .475-.345L11.48 3.5Z" />
+                </svg>
+                Penilaian
+            </a>
+
+            {{-- ── Mahasiswa ────────────────────────────── --}}
+            <div class="sidebar-nav-label" style="margin-top:.5rem;display:flex;align-items:center;gap:.4rem;">
+                <span style="width:8px;height:8px;border-radius:50%;background:#D97706;flex-shrink:0;display:inline-block;"></span>Mahasiswa
+            </div>
+            <a href="{{ route('mahasiswa.home') }}" class="sidebar-nav-item {{ request()->routeIs('mahasiswa.home') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 21v-8.25M15.75 21v-8.25M8.25 21v-8.25M3 9l9-6 9 6m-1.5 12V10.332A48.36 48.36 0 0 0 12 9.75c-2.551 0-5.056.2-7.5.582V21M3 21h18M12 6.75h.008v.008H12V6.75Z" />
+                </svg>
+                Dashboard
+            </a>
+            <a href="{{ url('/') }}" class="sidebar-nav-item {{ request()->is('/') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+                </svg>
+                Cari Lowongan
+            </a>
+            <a href="{{ route('lowongan.diajukan') }}" class="sidebar-nav-item {{ request()->routeIs('lowongan.diajukan') ? 'active' : '' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
+                </svg>
+                Pengajuan Saya
+            </a>
+
         @endif
     </nav>
     @endauth
