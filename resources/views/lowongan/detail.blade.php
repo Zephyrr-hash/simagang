@@ -533,14 +533,230 @@
                             'Indonesia',
                         ])->filter()->implode(', ');
                     @endphp
-                    <div id="map-container" style="border-radius:10px;overflow:hidden;border:1px solid #E0E7FF;">
-                        <div id="map" style="height:280px;width:100%;"></div>
+                    
+                    {{-- Leaflet CSS - Multiple CDN fallbacks --}}
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
+                    
+                    <div id="map-container" style="border-radius:10px;overflow:hidden;border:1px solid #E0E7FF;margin-top:1rem;">
+                        <div id="map" style="height:280px;width:100%;background:#F9FAFB;"></div>
                         <div style="background:#F5F3FF;padding:0.5rem 0.75rem;font-size:0.75rem;color:#6B7280;display:flex;align-items:center;gap:0.4rem;">
                             <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>
                             {{ $alamatQuery }}
                             &nbsp;|&nbsp; <span style="opacity:0.7;">© OpenStreetMap</span>
                         </div>
                     </div>
+                    
+                    {{-- Leaflet JS with fallback --}}
+                    <script>
+                    // Load Leaflet from jsDelivr CDN (faster and more reliable)
+                    (function() {
+                        var script = document.createElement('script');
+                        script.src = 'https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js';
+                        script.crossOrigin = '';
+                        script.onload = function() {
+                            console.log('✅ Leaflet loaded from jsDelivr');
+                        };
+                        script.onerror = function() {
+                            console.error('❌ Failed to load Leaflet from jsDelivr');
+                            // Fallback to unpkg
+                            var fallback = document.createElement('script');
+                            fallback.src = 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js';
+                            fallback.crossOrigin = '';
+                            fallback.onload = function() {
+                                console.log('✅ Leaflet loaded from unpkg (fallback)');
+                            };
+                            fallback.onerror = function() {
+                                console.error('❌ All CDN failed');
+                                document.getElementById('map').innerHTML = 
+                                    '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-size:0.85rem;flex-direction:column;gap:0.5rem;">' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">' +
+                                    '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>' +
+                                    '<path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>' +
+                                    '</svg>' +
+                                    '<span>Gagal memuat library peta</span>' +
+                                    '<small style="font-size:0.7rem;color:#D1D5DB;">CDN terblokir atau koneksi bermasalah</small>' +
+                                    '</div>';
+                            };
+                            document.head.appendChild(fallback);
+                        };
+                        document.head.appendChild(script);
+                    })();
+                    </script>
+                    
+                    {{-- Map Script - Wait for Leaflet --}}
+                    <script>
+                    (function() {
+                        var alamatQuery = {!! json_encode($alamatQuery ?? '') !!};
+                        var namaPerusahaan = {!! json_encode($low->nama_mitra ?? '') !!};
+                        
+                        console.log('🗺️ Map script started');
+                        console.log('📍 Alamat:', alamatQuery);
+                        
+                        if (!alamatQuery) {
+                            console.warn('⚠️ No address provided');
+                            document.getElementById('map-container').style.display = 'none';
+                            return;
+                        }
+                        
+                        // Wait for Leaflet to load
+                        var initAttempts = 0;
+                        var maxAttempts = 50; // Increased attempts
+                        
+                        function tryInitMap() {
+                            initAttempts++;
+                            
+                            if (typeof L !== 'undefined' && L.map) {
+                                console.log('✅ Leaflet ready! Initializing map...');
+                                initializeMap();
+                            } else if (initAttempts < maxAttempts) {
+                                if (initAttempts % 10 === 0) {
+                                    console.log('⏳ Waiting for Leaflet... attempt', initAttempts);
+                                }
+                                setTimeout(tryInitMap, 200); // Increased timeout
+                            } else {
+                                console.error('❌ Leaflet failed to load after', maxAttempts, 'attempts');
+                                document.getElementById('map').innerHTML = 
+                                    '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-size:0.85rem;flex-direction:column;gap:0.5rem;">' +
+                                    '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16">' +
+                                    '<path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>' +
+                                    '<path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>' +
+                                    '</svg>' +
+                                    '<span>Gagal memuat library peta</span>' +
+                                    '<small style="font-size:0.7rem;color:#D1D5DB;">Silakan refresh halaman atau cek koneksi internet</small>' +
+                                    '</div>';
+                            }
+                        }
+                        
+                        function initializeMap() {
+                            try {
+                                console.log('🚀 Creating map instance...');
+                                
+                                // Default center: Indonesia
+                                var map = L.map('map').setView([-2.548926, 118.014863], 5);
+                                
+                                console.log('🗺️ Map instance created');
+                                
+                                L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                                    maxZoom: 18,
+                                    attribution: '© OpenStreetMap'
+                                }).addTo(map);
+                                
+                                console.log('🎨 Tiles added, starting geocoding...');
+                                
+                                // Geocoding
+                                var geocodeUrl = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(alamatQuery);
+                                
+                                fetch(geocodeUrl, {
+                                    headers: { 
+                                        'Accept-Language': 'id',
+                                        'User-Agent': 'SIMAGANG/1.0'
+                                    }
+                                })
+                                .then(function(res) {
+                                    console.log('📡 Geocoding response:', res.status);
+                                    if (!res.ok) throw new Error('Geocoding failed');
+                                    return res.json();
+                                })
+                                .then(function(data) {
+                                    console.log('📊 Geocoding data:', data);
+                                    
+                                    if (data && data.length > 0) {
+                                        var lat = parseFloat(data[0].lat);
+                                        var lng = parseFloat(data[0].lon);
+                                        
+                                        console.log('✅ Location found:', lat, lng);
+                                        
+                                        map.setView([lat, lng], 15);
+                                        
+                                        // Simple marker
+                                        L.marker([lat, lng])
+                                            .addTo(map)
+                                            .bindPopup(
+                                                '<strong style="font-size:13px;">' + namaPerusahaan + '</strong><br>' +
+                                                '<small style="color:#6B7280;">' + alamatQuery + '</small>'
+                                            )
+                                            .openPopup();
+                                            
+                                        console.log('✅ Map fully initialized!');
+                                    } else {
+                                        console.warn('⚠️ No geocoding results, trying simplified address...');
+                                        
+                                        // Try dengan alamat yang lebih simple (hanya kota)
+                                        var cityOnly = 'Jakarta Selatan, Indonesia';
+                                        var simplifiedUrl = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(cityOnly);
+                                        
+                                        fetch(simplifiedUrl, {
+                                            headers: { 
+                                                'Accept-Language': 'id',
+                                                'User-Agent': 'SIMAGANG/1.0'
+                                            }
+                                        })
+                                        .then(function(res) { return res.json(); })
+                                        .then(function(cityData) {
+                                            if (cityData && cityData.length > 0) {
+                                                var lat = parseFloat(cityData[0].lat);
+                                                var lng = parseFloat(cityData[0].lon);
+                                                
+                                                console.log('✅ Fallback location (city level):', lat, lng);
+                                                
+                                                map.setView([lat, lng], 13);
+                                                
+                                                L.marker([lat, lng])
+                                                    .addTo(map)
+                                                    .bindPopup(
+                                                        '<strong style="font-size:13px;">' + namaPerusahaan + '</strong><br>' +
+                                                        '<small style="color:#6B7280;">' + alamatQuery + '</small><br>' +
+                                                        '<small style="color:#F59E0B;">⚠️ Lokasi perkiraan (city level)</small>'
+                                                    )
+                                                    .openPopup();
+                                            } else {
+                                                // Final fallback: Jakarta center
+                                                console.log('🎯 Using Jakarta center as fallback');
+                                                map.setView([-6.2088, 106.8456], 12);
+                                                
+                                                L.marker([-6.2088, 106.8456])
+                                                    .addTo(map)
+                                                    .bindPopup(
+                                                        '<strong style="font-size:13px;">' + namaPerusahaan + '</strong><br>' +
+                                                        '<small style="color:#6B7280;">' + alamatQuery + '</small><br>' +
+                                                        '<small style="color:#F59E0B;">⚠️ Lokasi perkiraan (Jakarta)</small>'
+                                                    )
+                                                    .openPopup();
+                                            }
+                                        })
+                                        .catch(function() {
+                                            // Final fallback
+                                            map.setView([-6.2088, 106.8456], 12);
+                                            L.marker([-6.2088, 106.8456])
+                                                .addTo(map)
+                                                .bindPopup(
+                                                    '<strong style="font-size:13px;">' + namaPerusahaan + '</strong><br>' +
+                                                    '<small style="color:#6B7280;">' + alamatQuery + '</small><br>' +
+                                                    '<small style="color:#F59E0B;">⚠️ Lokasi perkiraan (Jakarta)</small>'
+                                                )
+                                                .openPopup();
+                                        });
+                                    }
+                                })
+                                .catch(function(err) {
+                                    console.error('❌ Geocoding error:', err);
+                                    document.getElementById('map').innerHTML =
+                                        '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-size:0.85rem;flex-direction:column;gap:0.5rem;">' +
+                                        '<span>Gagal memuat lokasi</span>' +
+                                        '<small style="font-size:0.7rem;color:#D1D5DB;">Error: ' + err.message + '</small></div>';
+                                });
+                                
+                            } catch (error) {
+                                console.error('❌ Map initialization error:', error);
+                                document.getElementById('map').innerHTML =
+                                    '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-size:0.85rem;">Error: ' + error.message + '</div>';
+                            }
+                        }
+                        
+                        // Start initialization after a small delay
+                        setTimeout(tryInitMap, 500);
+                    })();
+                    </script>
                 </div>
 
             </div>{{-- /col-lg-8 --}}
@@ -652,78 +868,4 @@
     </div>
 </footer>
 
-@push('scripts')
-{{-- Leaflet CSS + JS (OpenStreetMap, gratis tanpa API key) --}}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV/XN/WLcE=" crossorigin=""></script>
-<script>
-(function () {
-    'use strict';
-
-    // Query alamat untuk geocoding
-    var alamatQuery = {!! json_encode($alamatQuery ?? ($low->alamat_mitra ?? '')) !!};
-    var namaPerusahaan = {!! json_encode($low->nama_mitra ?? '') !!};
-
-    if (!alamatQuery) {
-        document.getElementById('map-container').style.display = 'none';
-        return;
-    }
-
-    // Default center: Indonesia
-    var defaultLat = -2.548926;
-    var defaultLng = 118.014863;
-    var defaultZoom = 5;
-
-    // Init peta dengan default dulu
-    var map = L.map('map').setView([defaultLat, defaultLng], defaultZoom);
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 18,
-        attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-
-    // Custom marker icon (ungu sesuai tema)
-    var markerIcon = L.divIcon({
-        html: '<div style="width:32px;height:32px;background:linear-gradient(135deg,#4F46E5,#7C3AED);border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:3px solid #fff;box-shadow:0 2px 8px rgba(79,70,229,0.4);"></div>',
-        iconSize: [32, 32],
-        iconAnchor: [16, 32],
-        popupAnchor: [0, -34],
-        className: ''
-    });
-
-    // Geocoding via Nominatim (OpenStreetMap)
-    var geocodeUrl = 'https://nominatim.openstreetmap.org/search?format=json&limit=1&q=' + encodeURIComponent(alamatQuery);
-
-    fetch(geocodeUrl, {
-        headers: { 'Accept-Language': 'id', 'User-Agent': 'SIMAGANG-App' }
-    })
-    .then(function(res) { return res.json(); })
-    .then(function(data) {
-        if (data && data.length > 0) {
-            var lat = parseFloat(data[0].lat);
-            var lng = parseFloat(data[0].lon);
-            map.setView([lat, lng], 15);
-            L.marker([lat, lng], { icon: markerIcon })
-                .addTo(map)
-                .bindPopup(
-                    '<strong style="font-size:13px;">' + namaPerusahaan + '</strong>' +
-                    '<br><span style="font-size:11px;color:#6B7280;">' + alamatQuery + '</span>' +
-                    '<br><a href="https://www.openstreetmap.org/?mlat=' + lat + '&mlon=' + lng + '&zoom=16" target="_blank" style="font-size:11px;color:#4F46E5;">Buka di OpenStreetMap ↗</a>'
-                )
-                .openPopup();
-        } else {
-            // Tidak ditemukan, tampilkan pesan di map
-            document.getElementById('map').innerHTML =
-                '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-size:0.85rem;background:#F9FAFB;flex-direction:column;gap:0.5rem;">' +
-                '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="currentColor" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10zm0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6z"/></svg>' +
-                '<span>Lokasi tidak dapat ditampilkan di peta</span></div>';
-        }
-    })
-    .catch(function() {
-        document.getElementById('map').innerHTML =
-            '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#9CA3AF;font-size:0.85rem;background:#F9FAFB;">Gagal memuat peta</div>';
-    });
-})();
-</script>
-@endpush
-
+@endsection

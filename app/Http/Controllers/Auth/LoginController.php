@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\ActivityLogger;
 
 class LoginController extends Controller
 {
@@ -60,6 +61,9 @@ class LoginController extends Controller
             // Regenerate session untuk mencegah session fixation & 419 PAGE EXPIRED
             $request->session()->regenerate();
 
+            // Log login activity
+            ActivityLogger::logLogin();
+
             $user = $request->user();
             if ($user->role_id == Role::DEPARTEMEN) {
                 return redirect()->route('depart.home');
@@ -74,6 +78,25 @@ class LoginController extends Controller
             }
         }
         return back()->with('error', 'Alamat email dan password tidak sesuai!');
-        
+    }
+
+    /**
+     * Log the user out of the application.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function logout(Request $request)
+    {
+        // Log logout activity before logging out
+        ActivityLogger::logLogout();
+
+        Auth::logout();
+
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return redirect('/');
     }
 }
+

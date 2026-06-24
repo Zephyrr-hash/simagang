@@ -10,7 +10,7 @@
     /* ===== NAVBAR ===== */
     .navbar-simagang {
         background: #ffffff;
-        box-shadow: 0 1px 8px rgba(79, 70, 229, 0.10);
+        box-shadow: 0 1px 8px rgba(14, 165, 233, 0.10);
         position: sticky;
         top: 0;
         z-index: 1000;
@@ -19,15 +19,15 @@
     .navbar-simagang .brand {
         font-size: 1.5rem;
         font-weight: 700;
-        color: #4F46E5;
+        color: #0284C7;
         text-decoration: none;
         letter-spacing: -0.5px;
     }
     .navbar-simagang .brand span {
-        color: #7C3AED;
+        color: #14B8A6;
     }
     .btn-masuk {
-        background: linear-gradient(135deg, #4F46E5, #7C3AED);
+        background: linear-gradient(135deg, #0EA5E9, #14B8A6);
         color: #fff !important;
         border: none;
         border-radius: 8px;
@@ -35,18 +35,18 @@
         font-weight: 600;
         font-size: 0.875rem;
         text-decoration: none;
-        transition: opacity 0.2s;
+        transition: all 0.2s;
     }
-    .btn-masuk:hover { opacity: 0.88; color: #fff; }
+    .btn-masuk:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25); color: #fff; }
     .navbar-user-name {
         font-weight: 600;
-        color: #4F46E5;
+        color: #0284C7;
         font-size: 0.875rem;
     }
     .btn-dashboard {
-        background: #EEF2FF;
-        color: #4F46E5 !important;
-        border: 1.5px solid #C7D2FE;
+        background: #F0F9FF;
+        color: #0284C7 !important;
+        border: 1.5px solid #BAE6FD;
         border-radius: 8px;
         padding: 0.4rem 1.1rem;
         font-weight: 600;
@@ -54,7 +54,7 @@
         text-decoration: none;
         transition: background 0.2s;
     }
-    .btn-dashboard:hover { background: #E0E7FF; }
+    .btn-dashboard:hover { background: #E0F2FE; }
 </style>
 @endpush
 
@@ -62,7 +62,7 @@
 <style>
     /* ===== HERO ===== */
     .hero-section {
-        background: linear-gradient(135deg, #4F46E5 0%, #6D28D9 50%, #7C3AED 100%);
+        background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 50%, #14B8A6 100%);
         padding: 5rem 0 4rem;
         color: #fff;
         position: relative;
@@ -73,7 +73,7 @@
         position: absolute;
         top: -60px; right: -60px;
         width: 320px; height: 320px;
-        background: rgba(255,255,255,0.06);
+        background: rgba(255,255,255,0.08);
         border-radius: 50%;
     }
     .hero-section::after {
@@ -81,7 +81,7 @@
         position: absolute;
         bottom: -80px; left: -40px;
         width: 260px; height: 260px;
-        background: rgba(255,255,255,0.05);
+        background: rgba(255,255,255,0.06);
         border-radius: 50%;
     }
     .hero-title {
@@ -110,12 +110,12 @@
         border: none;
         padding: 0.85rem 1.25rem;
         font-size: 0.95rem;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
         outline: none;
-        color: #1E1B4B;
+        color: #0F172A;
     }
     .search-bar button {
-        background: #10B981;
+        background: #14B8A6;
         color: #fff;
         border: none;
         padding: 0.85rem 1.5rem;
@@ -123,9 +123,9 @@
         font-size: 0.95rem;
         cursor: pointer;
         transition: background 0.2s;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
     }
-    .search-bar button:hover { background: #059669; }
+    .search-bar button:hover { background: #0D9488; }
     .hero-stats {
         display: flex;
         gap: 2rem;
@@ -155,14 +155,14 @@
 <style>
     /* ===== LOWONGAN SECTION ===== */
     .lowongan-section {
-        background: #F5F3FF;
+        background: #F8FAFC;
         padding: 3.5rem 0 4rem;
         min-height: 60vh;
     }
     .section-title {
         font-size: 1.5rem;
         font-weight: 700;
-        color: #1E1B4B;
+        color: #0F172A;
         margin-bottom: 0.25rem;
     }
     .section-subtitle {
@@ -176,16 +176,16 @@
         background: #fff;
         border-radius: 14px;
         overflow: hidden;
-        box-shadow: 0 2px 12px rgba(79, 70, 229, 0.08);
+        box-shadow: 0 2px 12px rgba(14, 165, 233, 0.08);
         transition: transform 0.2s, box-shadow 0.2s;
         height: 100%;
         display: flex;
         flex-direction: column;
-        border: 1px solid #E0E7FF;
+        border: 1px solid #E2E8F0;
     }
     .card-lowongan:hover {
         transform: translateY(-4px);
-        box-shadow: 0 8px 28px rgba(79, 70, 229, 0.15);
+        box-shadow: 0 8px 28px rgba(14, 165, 233, 0.15);
     }
     .card-img-wrap {
         width: 100%;
@@ -215,8 +215,8 @@
     }
     .card-badge {
         display: inline-block;
-        background: #EEF2FF;
-        color: #4F46E5;
+        background: #F0F9FF;
+        color: #0369A1;
         font-size: 0.72rem;
         font-weight: 600;
         padding: 0.2rem 0.65rem;
@@ -228,7 +228,7 @@
     .card-title-low {
         font-size: 1rem;
         font-weight: 700;
-        color: #1E1B4B;
+        color: #0F172A;
         margin-bottom: 0.25rem;
         line-height: 1.3;
         display: -webkit-box;
@@ -238,7 +238,7 @@
     }
     .card-mitra-name {
         font-size: 0.85rem;
-        color: #4F46E5;
+        color: #0284C7;
         font-weight: 600;
         margin-bottom: 0.75rem;
     }
@@ -276,7 +276,7 @@
         display: block;
         width: 100%;
         text-align: center;
-        background: linear-gradient(135deg, #4F46E5, #7C3AED);
+        background: linear-gradient(135deg, #0EA5E9, #14B8A6);
         color: #fff !important;
         border: none;
         border-radius: 8px;
@@ -284,10 +284,10 @@
         font-weight: 600;
         font-size: 0.875rem;
         text-decoration: none;
-        transition: opacity 0.2s;
+        transition: all 0.2s cubic-bezier(0.165, 0.84, 0.44, 1);
         cursor: pointer;
     }
-    .btn-detail:hover { opacity: 0.88; color: #fff; }
+    .btn-detail:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(14, 165, 233, 0.25); color: #fff; }
 </style>
 @endpush
 
@@ -322,21 +322,21 @@
     }
     .pagination-wrap .page-link {
         border-radius: 8px !important;
-        border: 1.5px solid #E0E7FF;
-        color: #4F46E5;
+        border: 1.5px solid #E2E8F0;
+        color: #0284C7;
         font-weight: 500;
         font-size: 0.875rem;
         padding: 0.4rem 0.75rem;
         transition: all 0.15s;
     }
     .pagination-wrap .page-link:hover {
-        background: #EEF2FF;
-        border-color: #C7D2FE;
-        color: #4338CA;
+        background: #F0F9FF;
+        border-color: #BAE6FD;
+        color: #0369A1;
     }
     .pagination-wrap .page-item.active .page-link {
-        background: linear-gradient(135deg, #4F46E5, #7C3AED);
-        border-color: #4F46E5;
+        background: #0EA5E9;
+        border-color: #0EA5E9;
         color: #fff;
     }
     .pagination-wrap .page-item.disabled .page-link {
@@ -346,14 +346,14 @@
 
     /* ===== FOOTER ===== */
     .footer-simagang {
-        background: #1E1B4B;
+        background: #0F172A;
         color: rgba(255,255,255,0.65);
         text-align: center;
         padding: 1.5rem 0;
         font-size: 0.85rem;
     }
     .footer-simagang strong {
-        color: #A5B4FC;
+        color: #7DD3FC;
     }
 
     /* ===== RESPONSIVE ===== */
@@ -490,16 +490,16 @@
                                     src="{{ asset('images/' . $item->foto_low) }}"
                                     alt="{{ $item->nama_low }}"
                                     loading="lazy"
-                                    onerror="this.parentElement.innerHTML='<div class=\'card-img-placeholder\' style=\'background:linear-gradient(135deg,#4F46E5,#7C3AED);\'>🏢</div>'"
+                                    onerror="this.parentElement.innerHTML='<div class=\'card-img-placeholder\' style=\'background:linear-gradient(135deg,#0EA5E9,#14B8A6);\'>🏢</div>'"
                                 >
                             @else
                                 @php
                                     $gradients = [
-                                        'linear-gradient(135deg,#4F46E5,#7C3AED)',
-                                        'linear-gradient(135deg,#7C3AED,#EC4899)',
-                                        'linear-gradient(135deg,#10B981,#3B82F6)',
-                                        'linear-gradient(135deg,#F59E0B,#EF4444)',
-                                        'linear-gradient(135deg,#3B82F6,#6D28D9)',
+                                        'linear-gradient(135deg,#0EA5E9,#14B8A6)',
+                                        'linear-gradient(135deg,#14B8A6,#06B6D4)',
+                                        'linear-gradient(135deg,#38BDF8,#2DD4BF)',
+                                        'linear-gradient(135deg,#0284C7,#0D9488)',
+                                        'linear-gradient(135deg,#0369A1,#0F766E)',
                                     ];
                                     $grad = $gradients[$item->id % count($gradients)];
                                 @endphp

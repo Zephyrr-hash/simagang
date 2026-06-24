@@ -77,6 +77,12 @@ Route::group(['middleware' => ['is_depart', 'profile_complete']], function () {
     Route::get('depart/pengajuan', [ApplyController::class, 'listPengajuan'])->name('pengajuan.index');
     Route::get('depart/pengajuan/{id}', [ApplyController::class, 'pengajuan'])->name('pengajuan.edit');
     Route::post('depart/pengajuan/{id}', [ApplyController::class, 'updateDospem'])->name('pengajuan.dospem');
+    
+    // Activity Logs
+    Route::get('depart/activity-logs', [\App\Http\Controllers\ActivityLogController::class, 'index'])->name('activity-logs.index');
+    Route::get('depart/activity-logs/{id}', [\App\Http\Controllers\ActivityLogController::class, 'show'])->name('activity-logs.show');
+    Route::get('depart/activity-logs-export', [\App\Http\Controllers\ActivityLogController::class, 'export'])->name('activity-logs.export');
+    Route::post('depart/activity-logs-clear', [\App\Http\Controllers\ActivityLogController::class, 'clearOld'])->name('activity-logs.clear');
 });
 
 // =====================================================================

@@ -14,11 +14,6 @@ use Illuminate\Support\Facades\Auth;
 
 class DepartController extends BaseController
 {
-    public function countPengajuan(): int
-    {
-        return Magang::whereNull('dosen_id')->count();
-    }
-
     public function detailMhs($id)
     {
         $mhs = Mahasiswa::with(['status', 'jurusan'])->findOrFail($id);
@@ -56,43 +51,91 @@ class DepartController extends BaseController
         $mhs     = $this->countMhs();
         $mhsMag  = $this->countMhsMagang();
         $blmMag  = $this->countBelumMagang();
+        
+        // Get current departemen
+        $depart = Departemen::where('user_id', Auth::id())->first();
+        
         $authProfile = $this->getAuthProfile();
-        return view('depart.home', compact('authProfile', 'count', 'user', 'mitra', 'spv', 'dosen', 'mhs', 'mhsMag', 'blmMag'));
+        return view('depart.home', compact('authProfile', 'count', 'user', 'mitra', 'spv', 'dosen', 'mhs', 'mhsMag', 'blmMag', 'depart'));
     }
 
     public function countUser(): int
     {
-        return User::count();
+        // Hanya user yang dibuat oleh departemen ini
+        return User::where('created_by', Auth::id())->count();
     }
 
     public function countMitra(): int
     {
-        return User::where('role_id', Role::MITRA)->count();
+        // Hanya mitra yang dibuat oleh departemen ini
+        return User::where('role_id', Role::MITRA)
+            ->where('created_by', Auth::id())
+            ->count();
     }
 
     public function countSpv(): int
     {
-        return User::where('role_id', Role::SUPERVISOR)->count();
+        // Hanya supervisor yang dibuat oleh departemen ini
+        return User::where('role_id', Role::SUPERVISOR)
+            ->where('created_by', Auth::id())
+            ->count();
     }
 
     public function countDosen(): int
     {
-        return User::where('role_id', Role::DOSPEM)->count();
+        // Hanya dosen dari departemen ini
+        $depart = Departemen::where('user_id', Auth::id())->first();
+        if (!$depart) return 0;
+        
+        return User::where('role_id', Role::DOSPEM)
+            ->whereHas('dospem', function($q) use ($depart) {
+                $q->where('depart_id', $depart->id);
+            })
+            ->count();
     }
 
     public function countMhs(): int
     {
-        return User::where('role_id', Role::MAHASISWA)->count();
+        // Hanya mahasiswa dari departemen ini
+        $depart = Departemen::where('user_id', Auth::id())->first();
+        if (!$depart) return 0;
+        
+        return Mahasiswa::where('depart_id', $depart->id)->count();
     }
 
     public function countMhsMagang(): int
     {
-        return Mahasiswa::where('status_id', 2)->count();
+        // Hanya mahasiswa magang dari departemen ini
+        $depart = Departemen::where('user_id', Auth::id())->first();
+        if (!$depart) return 0;
+        
+        return Mahasiswa::where('depart_id', $depart->id)
+            ->where('status_id', 2)
+            ->count();
     }
 
     public function countBelumMagang(): int
     {
-        return Mahasiswa::where('status_id', 1)->count();
+        // Hanya mahasiswa belum magang dari departemen ini
+        $depart = Departemen::where('user_id', Auth::id())->first();
+        if (!$depart) return 0;
+        
+        return Mahasiswa::where('depart_id', $depart->id)
+            ->where('status_id', 1)
+            ->count();
+    }
+
+    public function countPengajuan(): int
+    {
+        // Hanya pengajuan dari mahasiswa departemen ini
+        $depart = Departemen::where('user_id', Auth::id())->first();
+        if (!$depart) return 0;
+        
+        return Magang::whereNull('dosen_id')
+            ->whereHas('mahasiswa', function($q) use ($depart) {
+                $q->where('depart_id', $depart->id);
+            })
+            ->count();
     }
 
     public function index()

@@ -188,11 +188,18 @@ class ApplyController extends BaseController
 
     public function pengajuan($id)
     {
-        $magang = Magang::with(['mahasiswa', 'lowongan.mitra'])->findOrFail($id);
+        $departId = Departemen::where('user_id', Auth::id())->firstOrFail();
+        
+        // Verifikasi bahwa magang ini milik mahasiswa dari departemen yang login
+        $magang = Magang::with(['mahasiswa', 'lowongan.mitra'])
+            ->whereHas('mahasiswa', function($q) use ($departId) {
+                $q->where('depart_id', $departId->id);
+            })
+            ->findOrFail($id);
+            
         $mhs    = $magang->mahasiswa;
         $skill  = SkillMhs::with('skill')->where('mhs_id', $mhs->id)->get();
 
-        $departId = Departemen::where('user_id', Auth::id())->firstOrFail();
         $dosen    = Dosen::where('depart_id', $departId->id)->get();
 
         $authProfile = $this->getAuthProfile();
@@ -209,7 +216,18 @@ class ApplyController extends BaseController
             return redirect()->back()->with('errorForm', $validator->errors()->getMessages())->withInput();
         }
 
-        $magang = Magang::findOrFail($id);
+        // Verifikasi bahwa magang ini milik mahasiswa dari departemen yang login
+        $departId = Departemen::where('user_id', Auth::id())->firstOrFail();
+        $magang = Magang::whereHas('mahasiswa', function($q) use ($departId) {
+                $q->where('depart_id', $departId->id);
+            })
+            ->findOrFail($id);
+            
+        // Verifikasi bahwa dosen yang dipilih adalah milik departemen ini
+        $dosen = Dosen::where('id', $request->dosen_id)
+            ->where('depart_id', $departId->id)
+            ->firstOrFail();
+
         try {
             DB::transaction(function () use ($magang, $request) {
                 // Hanya update dosen_id — TIDAK mengubah status mahasiswa

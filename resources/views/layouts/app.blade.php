@@ -7,10 +7,10 @@
 
     <title>@yield('title', 'SIMAGANG')</title>
 
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -18,17 +18,68 @@
     <!-- SweetAlert2 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 
+    <!-- SIMAGANG Redesign CSS (Sky Blue Theme) -->
+    <link rel="stylesheet" href="{{ asset('css/simagang-redesign.css') }}">
+
     <style>
+        /* ===== DESIGN SYSTEM: SIMAGANG ===== */
+        /* Impeccable-guided, Sky Blue palette, Plus Jakarta Sans */
+
         /* ===== RESET & BASE ===== */
         *, *::before, *::after { box-sizing: border-box; }
 
+        :root {
+            /* Sky Blue Primary */
+            --sky-50:  #F0F9FF;
+            --sky-100: #E0F2FE;
+            --sky-200: #BAE6FD;
+            --sky-300: #7DD3FC;
+            --sky-400: #38BDF8;
+            --sky-500: #0EA5E9;
+            --sky-600: #0284C7;
+            --sky-700: #0369A1;
+            --sky-800: #075985;
+            --sky-900: #0C4A6E;
+
+            /* Teal Accent */
+            --teal-400: #2DD4BF;
+            --teal-500: #14B8A6;
+            --teal-600: #0D9488;
+
+            /* Slate Neutrals */
+            --slate-50:  #F8FAFC;
+            --slate-100: #F1F5F9;
+            --slate-200: #E2E8F0;
+            --slate-300: #CBD5E1;
+            --slate-400: #94A3B8;
+            --slate-500: #64748B;
+            --slate-600: #475569;
+            --slate-700: #334155;
+            --slate-800: #1E293B;
+            --slate-900: #0F172A;
+
+            /* Semantic */
+            --success: #14B8A6;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+            --info: #0EA5E9;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F5F3FF;
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: var(--slate-50);
             display: flex;
             min-height: 100vh;
             margin: 0;
             overflow-x: hidden;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
 
         /* ===== SIDEBAR ===== */
@@ -38,47 +89,47 @@
             left: 0;
             width: 260px;
             height: 100vh;
-            background-color: #1E1B4B;
+            background-color: var(--slate-900);
             display: flex;
             flex-direction: column;
             z-index: 1040;
             overflow-y: auto;
             overflow-x: hidden;
-            transition: transform 0.3s ease;
+            transition: transform 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
         .sidebar::-webkit-scrollbar { width: 4px; }
         .sidebar::-webkit-scrollbar-track { background: transparent; }
-        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 2px; }
+        .sidebar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 2px; }
 
         /* Logo area */
         .sidebar-logo {
             padding: 1.5rem 1.25rem 1rem;
             display: flex;
             align-items: center;
-            gap: 0.625rem;
+            gap: 0.75rem;
             text-decoration: none;
             flex-shrink: 0;
         }
 
         .sidebar-logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #4F46E5, #7C3AED);
-            border-radius: 8px;
+            width: 38px;
+            height: 38px;
+            background: linear-gradient(135deg, var(--sky-400), var(--teal-400));
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
         }
 
-        .sidebar-logo-icon svg { width: 20px; height: 20px; color: #fff; }
+        .sidebar-logo-icon svg { width: 22px; height: 22px; color: #fff; }
 
         .sidebar-logo-text {
-            font-size: 1.125rem;
-            font-weight: 700;
+            font-size: 1.25rem;
+            font-weight: 800;
             color: #fff;
-            letter-spacing: 0.05em;
+            letter-spacing: -0.02em;
         }
 
         /* User info */
@@ -90,27 +141,27 @@
         }
 
         .sidebar-avatar {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
             object-fit: cover;
             flex-shrink: 0;
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 2px solid rgba(56, 189, 248, 0.2);
         }
 
         .sidebar-avatar-initials {
-            width: 42px;
-            height: 42px;
+            width: 44px;
+            height: 44px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            background: linear-gradient(135deg, var(--sky-400), var(--teal-400));
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 0.875rem;
-            font-weight: 600;
+            font-weight: 700;
             color: #fff;
             flex-shrink: 0;
-            border: 2px solid rgba(255,255,255,0.2);
+            border: 2px solid rgba(56, 189, 248, 0.2);
         }
 
         .sidebar-user-info { overflow: hidden; }
@@ -174,7 +225,7 @@
         }
 
         .sidebar-nav-item.active {
-            background: #4F46E5;
+            background: var(--sky-600);
             color: #fff;
         }
 
@@ -220,7 +271,7 @@
             top: 0;
             z-index: 1030;
             background: #fff;
-            border-bottom: 1px solid #E0E7FF;
+            border-bottom: 1px solid var(--slate-200);
             padding: 0 1.5rem;
             height: 60px;
             display: flex;
@@ -264,7 +315,7 @@
         }
 
         .topbar-breadcrumb .breadcrumb-item a {
-            color: #4F46E5;
+            color: var(--sky-600);
             text-decoration: none;
         }
 
@@ -278,7 +329,7 @@
             align-items: center;
             gap: 0.5rem;
             background: none;
-            border: 1px solid #E0E7FF;
+            border: 1px solid var(--slate-200);
             border-radius: 8px;
             padding: 0.375rem 0.75rem 0.375rem 0.5rem;
             cursor: pointer;
@@ -288,8 +339,8 @@
         }
 
         .topbar-user-btn:hover {
-            background: #F5F3FF;
-            border-color: #C7D2FE;
+            background: var(--sky-50);
+            border-color: var(--sky-200);
             color: #374151;
             text-decoration: none;
         }
@@ -305,7 +356,7 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #4F46E5, #7C3AED);
+            background: linear-gradient(135deg, var(--sky-400), var(--teal-400));
             display: flex;
             align-items: center;
             justify-content: center;
@@ -334,7 +385,7 @@
             right: 0;
             top: calc(100% + 8px);
             background: #fff;
-            border: 1px solid #E0E7FF;
+            border: 1px solid var(--slate-200);
             border-radius: 10px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             min-width: 180px;
@@ -360,9 +411,9 @@
             text-align: left;
         }
 
-        .topbar-dropdown-item:hover { background: #F5F3FF; color: #4F46E5; text-decoration: none; }
+        .topbar-dropdown-item:hover { background: var(--sky-50); color: var(--sky-700); text-decoration: none; }
         .topbar-dropdown-item svg { width: 16px; height: 16px; flex-shrink: 0; }
-        .topbar-dropdown-divider { height: 1px; background: #E0E7FF; margin: 0.25rem 0; }
+        .topbar-dropdown-divider { height: 1px; background: var(--slate-200); margin: 0.25rem 0; }
         .topbar-dropdown-item.text-danger:hover { background: #FEF2F2; color: #EF4444; }
 
         /* ===== PAGE CONTENT ===== */
@@ -509,6 +560,14 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z" />
                 </svg>
                 Pengajuan Dospem
+            </a>
+            <a href="{{ route('activity-logs.index') }}"
+               class="sidebar-nav-item {{ request()->routeIs('activity-logs.*') ? 'active' : '' }}"
+               aria-current="{{ request()->routeIs('activity-logs.*') ? 'page' : 'false' }}">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 0 1 0 3.75H5.625a1.875 1.875 0 0 1 0-3.75Z" />
+                </svg>
+                Log Aktivitas
             </a>
         @endif
 

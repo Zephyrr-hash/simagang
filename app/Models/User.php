@@ -21,6 +21,7 @@ class User extends Authenticatable
         'role_id',
         'email',
         'password',
+        'created_by',
     ];
 
     /**
@@ -64,5 +65,19 @@ class User extends Authenticatable
 
     public function role(){
         return $this->belongsTo(Role::class);
+    }
+
+    /**
+     * User yang membuat user ini (creator)
+     */
+    public function creator(){
+        return $this->belongsTo(User::class, 'created_by');
+    }
+
+    /**
+     * User-user yang dibuat oleh user ini
+     */
+    public function createdUsers(){
+        return $this->hasMany(User::class, 'created_by');
     }
 }

@@ -13,7 +13,7 @@
         height: 100%;
         margin: 0;
         padding: 0;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     }
 
     /* ===== Split Screen Container ===== */
@@ -26,7 +26,7 @@
     /* ===== Panel Kiri — Branding ===== */
     .panel-left {
         width: 50%;
-        background: linear-gradient(135deg, #4F46E5 0%, #6D28D9 50%, #7C3AED 100%);
+        background: linear-gradient(135deg, #0EA5E9 0%, #0284C7 50%, #14B8A6 100%);
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -44,7 +44,7 @@
         right: -80px;
         width: 320px;
         height: 320px;
-        background: rgba(255, 255, 255, 0.07);
+        background: rgba(255, 255, 255, 0.08);
         border-radius: 50%;
         pointer-events: none;
     }
@@ -56,7 +56,7 @@
         left: -60px;
         width: 400px;
         height: 400px;
-        background: rgba(255, 255, 255, 0.05);
+        background: rgba(255, 255, 255, 0.06);
         border-radius: 50%;
         pointer-events: none;
     }
@@ -167,7 +167,7 @@
     .login-heading {
         font-size: 1.75rem;
         font-weight: 700;
-        color: #1E1B4B;
+        color: #0F172A;
         margin-bottom: 0.4rem;
         letter-spacing: -0.3px;
     }
@@ -252,7 +252,7 @@
     }
 
     .input-icon-wrapper .toggle-password:hover {
-        color: #4F46E5;
+        color: #0EA5E9;
     }
 
     .input-icon-wrapper .toggle-password svg {
@@ -266,17 +266,17 @@
         border: 1.5px solid #E5E7EB;
         border-radius: 10px;
         font-size: 0.9rem;
-        font-family: 'Inter', sans-serif;
-        color: #1E1B4B;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #0F172A;
         background: #FAFAFA;
         transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
         outline: none;
     }
 
     .form-input-custom:focus {
-        border-color: #4F46E5;
+        border-color: #0EA5E9;
         background: #ffffff;
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
     }
 
     .form-input-custom::placeholder {
@@ -293,13 +293,13 @@
     .btn-login {
         width: 100%;
         padding: 0.8rem 1rem;
-        background: #4F46E5;
+        background: #0EA5E9;
         color: #ffffff;
         border: none;
         border-radius: 10px;
         font-size: 0.95rem;
         font-weight: 600;
-        font-family: 'Inter', sans-serif;
+        font-family: 'Plus Jakarta Sans', sans-serif;
         cursor: pointer;
         transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
         margin-top: 0.5rem;
@@ -307,13 +307,13 @@
     }
 
     .btn-login:hover {
-        background: #4338CA;
-        box-shadow: 0 4px 15px rgba(79, 70, 229, 0.35);
+        background: #0284C7;
+        box-shadow: 0 4px 15px rgba(14, 165, 233, 0.35);
         transform: translateY(-1px);
     }
 
     .btn-login:active {
-        background: #3730A3;
+        background: #0369A1;
         transform: translateY(0);
         box-shadow: none;
     }
@@ -327,7 +327,7 @@
     }
 
     .login-footer a {
-        color: #4F46E5;
+        color: #0EA5E9;
         text-decoration: none;
         font-weight: 500;
     }
@@ -579,7 +579,7 @@
             icon: 'error',
             title: 'Login Gagal',
             text: '{{ session('error') }}',
-            confirmButtonColor: '#4F46E5',
+            confirmButtonColor: '#0EA5E9',
             confirmButtonText: 'Coba Lagi',
         });
     @endif

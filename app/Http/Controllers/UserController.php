@@ -14,13 +14,17 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\ActivityLogger;
 
 class UserController extends BaseController
 {
     public function index(Request $request)
     {
         $search = $request->search;
-        $users = User::with('role')
+        
+        // Filter: hanya tampilkan user yang dibuat oleh departemen yang sedang login
+        $users = User::with(['role', 'creator'])
+            ->where('created_by', Auth::id()) // FILTER BY CREATOR
             ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%"))
             ->orderBy('role_id', 'asc')
@@ -56,12 +60,13 @@ class UserController extends BaseController
         $depart = Departemen::where('user_id', Auth::id())->first();
 
         try {
-            DB::transaction(function () use ($request, $depart) {
+            DB::transaction(function () use ($request, $depart, &$user) {
                 $user = User::create([
-                    'name'     => $request->name,
-                    'email'    => $request->email,
-                    'role_id'  => $request->role_id,
-                    'password' => Hash::make($request->password),
+                    'name'       => $request->name,
+                    'email'      => $request->email,
+                    'role_id'    => $request->role_id,
+                    'password'   => Hash::make($request->password),
+                    'created_by' => Auth::id(), // SET CREATOR
                 ]);
 
                 match ((int) $request->role_id) {
@@ -74,6 +79,13 @@ class UserController extends BaseController
                 };
             });
 
+            // Log activity
+            ActivityLogger::logCreate('user', $user->name, [
+                'user_id' => $user->id,
+                'role_id' => $user->role_id,
+                'email' => $user->email,
+            ]);
+
             return redirect()->route('users.index')->with('success', 'Akun berhasil dibuat!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal membuat akun. Silakan coba lagi.')->withInput();
@@ -82,6 +94,11 @@ class UserController extends BaseController
 
     public function show(User $user)
     {
+        // Security: hanya bisa view user yang dibuat oleh departemen ini
+        if ($user->created_by !== Auth::id()) {
+            return response()->json(['code' => 403, 'result' => 'Forbidden']);
+        }
+
         $result = User::find($user->id);
         return response()->json($result
             ? ['code' => 200, 'result' => $result]
@@ -91,6 +108,12 @@ class UserController extends BaseController
 
     public function edit(User $user)
     {
+        // Security: hanya bisa edit user yang dibuat oleh departemen ini
+        if ($user->created_by !== Auth::id()) {
+            return redirect()->route('users.index')
+                ->with('error', 'Anda tidak memiliki akses untuk mengedit user ini.');
+        }
+
         $role = Role::all();
         $authProfile = $this->getAuthProfile();
         return view('depart.user.edit', compact('user', 'role', 'authProfile'));
@@ -98,6 +121,12 @@ class UserController extends BaseController
 
     public function update(Request $request, User $user)
     {
+        // Security: hanya bisa update user yang dibuat oleh departemen ini
+        if ($user->created_by !== Auth::id()) {
+            return redirect()->route('users.index')
+                ->with('error', 'Anda tidak memiliki akses untuk mengubah user ini.');
+        }
+
         $validator = Validator::make($request->all(), [
             'name'    => 'required|string|max:255',
             'role_id' => 'required|integer|exists:role,id',
@@ -128,6 +157,12 @@ class UserController extends BaseController
                 };
             });
 
+            // Log activity
+            ActivityLogger::logUpdate('user', $user->name, [
+                'user_id' => $user->id,
+                'changes' => $request->only(['name', 'email', 'role_id']),
+            ]);
+
             return redirect()->route('users.index')->with('success', 'Akun berhasil diubah!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal mengubah akun.')->withInput();
@@ -142,10 +177,24 @@ class UserController extends BaseController
             return redirect()->back()->with('error', 'User tidak ditemukan.');
         }
 
+        // Security: hanya bisa delete user yang dibuat oleh departemen ini
+        if ($user->created_by !== Auth::id()) {
+            return redirect()->route('users.index')
+                ->with('error', 'Anda tidak memiliki akses untuk menghapus user ini.');
+        }
+
         try {
+            $userName = $user->name;
+            
             DB::transaction(function () use ($user) {
                 $user->delete();
             });
+
+            // Log activity
+            ActivityLogger::logDelete('user', $userName, [
+                'user_id' => $id,
+            ]);
+
             return redirect()->back()->with('success', 'User berhasil dihapus!');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Gagal menghapus user.');
