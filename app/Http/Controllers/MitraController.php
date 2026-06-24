@@ -22,6 +22,11 @@ class MitraController extends BaseController
 
     public function mitraHome()
     {
+        // Superadmin diarahkan ke dashboard-nya sendiri
+        if ((int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN) {
+            return redirect()->route('superadmin.home');
+        }
+
         $count = $this->countPendaftar();
         $low   = $this->countLowongan();
         $mag   = $this->countMag();

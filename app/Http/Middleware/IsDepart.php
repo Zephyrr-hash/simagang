@@ -22,7 +22,7 @@ class IsDepart
             return redirect()->route('login');
         }
 
-        if (Auth::user()->role_id == Role::DEPARTEMEN) {
+        if (Auth::user()->role_id == Role::DEPARTEMEN || Auth::user()->role_id == Role::SUPERADMIN) {
             return $next($request);
         }
 

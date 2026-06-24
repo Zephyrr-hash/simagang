@@ -23,13 +23,19 @@ class ApplyController extends BaseController
 
     public function penilaian()
     {
-        $data = Magang::with(['mahasiswa', 'lowongan'])
-            ->join('supervisor', 'magang.spv_id', '=', 'supervisor.id')
-            ->where('supervisor.user_id', Auth::id())
-            ->where('approval', Magang::SELESAI)
-            ->select('magang.*', 'magang.id as mag_id')
-            ->get();
         $authProfile = $this->getAuthProfile();
+        $isSuperadmin = (int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN;
+
+        $query = Magang::with(['mahasiswa', 'lowongan'])
+            ->where('approval', Magang::SELESAI)
+            ->select('magang.*', 'magang.id as mag_id');
+
+        if (!$isSuperadmin) {
+            $query->join('supervisor', 'magang.spv_id', '=', 'supervisor.id')
+                  ->where('supervisor.user_id', Auth::id());
+        }
+
+        $data = $query->get();
         return view('spv.penilaian.index', compact('data', 'authProfile'));
     }
 
@@ -175,14 +181,20 @@ class ApplyController extends BaseController
 
     public function listPengajuan()
     {
-        $magang = Magang::with(['mahasiswa', 'lowongan.mitra'])
+        $authProfile  = $this->getAuthProfile();
+        $isSuperadmin = (int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN;
+
+        $query = Magang::with(['mahasiswa', 'lowongan.mitra'])
             ->join('mahasiswa', 'magang.mhs_id', '=', 'mahasiswa.id')
-            ->join('departemen', 'mahasiswa.depart_id', '=', 'departemen.id')
-            ->where('departemen.user_id', Auth::id())
             ->whereNull('magang.dosen_id')
-            ->select('magang.*')
-            ->get();
-        $authProfile = $this->getAuthProfile();
+            ->select('magang.*');
+
+        if (!$isSuperadmin) {
+            $query->join('departemen', 'mahasiswa.depart_id', '=', 'departemen.id')
+                  ->where('departemen.user_id', Auth::id());
+        }
+
+        $magang = $query->get();
         return view('depart.pengajuan.index', compact('magang', 'authProfile'));
     }
 
@@ -245,14 +257,20 @@ class ApplyController extends BaseController
 
     public function listPendaftar()
     {
-        $data = Magang::with(['mahasiswa', 'lowongan'])
+        $authProfile  = $this->getAuthProfile();
+        $isSuperadmin = (int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN;
+
+        $query = Magang::with(['mahasiswa', 'lowongan'])
             ->join('lowongan', 'magang.lowongan_id', '=', 'lowongan.id')
             ->join('mitra', 'lowongan.mitra_id', '=', 'mitra.id')
-            ->where('mitra.user_id', Auth::id())
             ->where('magang.approval', Magang::PENDING)
-            ->select('magang.*')
-            ->get();
-        $authProfile = $this->getAuthProfile();
+            ->select('magang.*');
+
+        if (!$isSuperadmin) {
+            $query->where('mitra.user_id', Auth::id());
+        }
+
+        $data = $query->get();
         return view('mitra.pendaftar.index', compact('data', 'authProfile'));
     }
 
@@ -335,15 +353,21 @@ class ApplyController extends BaseController
 
     public function listMagang()
     {
-        $data = Magang::with(['mahasiswa', 'lowongan', 'spv'])
+        $authProfile  = $this->getAuthProfile();
+        $isSuperadmin = (int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN;
+
+        $query = Magang::with(['mahasiswa', 'lowongan', 'spv'])
             ->join('lowongan', 'magang.lowongan_id', '=', 'lowongan.id')
             ->join('mitra', 'lowongan.mitra_id', '=', 'mitra.id')
-            ->where('mitra.user_id', Auth::id())
             ->where('magang.approval', '!=', Magang::DITOLAK)
             ->select('magang.*')
-            ->orderBy('magang.approval', 'asc')
-            ->get();
-        $authProfile = $this->getAuthProfile();
+            ->orderBy('magang.approval', 'asc');
+
+        if (!$isSuperadmin) {
+            $query->where('mitra.user_id', Auth::id());
+        }
+
+        $data = $query->get();
         return view('mitra.magang.index', compact('data', 'authProfile'));
     }
 

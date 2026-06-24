@@ -91,6 +91,9 @@ class ProjectController extends BaseController
                              ->orderBy('created_at', 'desc')->get();
             })(),
 
+            // Superadmin melihat semua project
+            Role::SUPERADMIN => $query->orderBy('created_at', 'desc')->get(),
+
             default => collect(),
         };
     }

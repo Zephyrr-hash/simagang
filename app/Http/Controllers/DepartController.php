@@ -32,17 +32,30 @@ class DepartController extends BaseController
 
     public function listMhs()
     {
-        $depart = Departemen::where('user_id', Auth::id())->first();
-        $mhs = Mahasiswa::with('status')
-            ->where('depart_id', $depart->id)
-            ->orderBy('status_id', 'asc')
-            ->get();
-        $authProfile = $this->getAuthProfile();
+        $authProfile  = $this->getAuthProfile();
+        $isSuperadmin = (int) Auth::user()->role_id === Role::SUPERADMIN;
+
+        // Superadmin melihat semua mahasiswa, Departemen hanya miliknya
+        if ($isSuperadmin) {
+            $mhs = Mahasiswa::with('status')->orderBy('status_id', 'asc')->get();
+        } else {
+            $depart = Departemen::where('user_id', Auth::id())->firstOrFail();
+            $mhs = Mahasiswa::with('status')
+                ->where('depart_id', $depart->id)
+                ->orderBy('status_id', 'asc')
+                ->get();
+        }
+
         return view('depart.mhs.index', compact('mhs', 'authProfile'));
     }
 
     public function departHome()
     {
+        // Superadmin diarahkan ke dashboard-nya sendiri
+        if ((int) Auth::user()->role_id === Role::SUPERADMIN) {
+            return redirect()->route('superadmin.home');
+        }
+
         $count   = $this->countPengajuan();
         $user    = $this->countUser();
         $mitra   = $this->countMitra();

@@ -13,6 +13,11 @@ class DospemController extends BaseController
 {
     public function dospemHome()
     {
+        // Superadmin diarahkan ke dashboard-nya sendiri
+        if ((int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN) {
+            return redirect()->route('superadmin.home');
+        }
+
         $mhsBim  = $this->countMhsBim();
         $feedback = $this->countBim();
         $authProfile = $this->getAuthProfile();

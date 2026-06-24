@@ -22,7 +22,7 @@ class IsDospem
             return redirect()->route('login');
         }
 
-        if (Auth::user()->role_id == Role::DOSPEM) {
+        if (Auth::user()->role_id == Role::DOSPEM || Auth::user()->role_id == Role::SUPERADMIN) {
             return $next($request);
         }
 

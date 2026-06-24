@@ -22,14 +22,17 @@ class UserController extends BaseController
     {
         $search = $request->search;
         
-        // Filter: hanya tampilkan user yang dibuat oleh departemen yang sedang login
-        $users = User::with(['role', 'creator'])
-            ->where('created_by', Auth::id()) // FILTER BY CREATOR
+        $query = User::with(['role', 'creator'])
             ->when($search, fn($q) => $q->where('name', 'like', "%{$search}%")
                 ->orWhere('email', 'like', "%{$search}%"))
-            ->orderBy('role_id', 'asc')
-            ->paginate(15)
-            ->withQueryString();
+            ->orderBy('role_id', 'asc');
+
+        // Superadmin lihat semua user, Departemen hanya yang dibuat sendiri
+        if ((int) Auth::user()->role_id !== \App\Models\Role::SUPERADMIN) {
+            $query->where('created_by', Auth::id());
+        }
+
+        $users = $query->paginate(15)->withQueryString();
 
         $authProfile = $this->getAuthProfile();
         return view('depart.user.index', compact('users', 'authProfile', 'search'));
@@ -94,8 +97,8 @@ class UserController extends BaseController
 
     public function show(User $user)
     {
-        // Security: hanya bisa view user yang dibuat oleh departemen ini
-        if ($user->created_by !== Auth::id()) {
+        // Superadmin bisa lihat semua, Departemen hanya yang dibuat sendiri
+        if ((int) Auth::user()->role_id !== \App\Models\Role::SUPERADMIN && $user->created_by !== Auth::id()) {
             return response()->json(['code' => 403, 'result' => 'Forbidden']);
         }
 
@@ -108,8 +111,8 @@ class UserController extends BaseController
 
     public function edit(User $user)
     {
-        // Security: hanya bisa edit user yang dibuat oleh departemen ini
-        if ($user->created_by !== Auth::id()) {
+        // Superadmin bisa edit semua, Departemen hanya yang dibuat sendiri
+        if ((int) Auth::user()->role_id !== \App\Models\Role::SUPERADMIN && $user->created_by !== Auth::id()) {
             return redirect()->route('users.index')
                 ->with('error', 'Anda tidak memiliki akses untuk mengedit user ini.');
         }
@@ -121,8 +124,8 @@ class UserController extends BaseController
 
     public function update(Request $request, User $user)
     {
-        // Security: hanya bisa update user yang dibuat oleh departemen ini
-        if ($user->created_by !== Auth::id()) {
+        // Superadmin bisa update semua, Departemen hanya yang dibuat sendiri
+        if ((int) Auth::user()->role_id !== \App\Models\Role::SUPERADMIN && $user->created_by !== Auth::id()) {
             return redirect()->route('users.index')
                 ->with('error', 'Anda tidak memiliki akses untuk mengubah user ini.');
         }
@@ -177,8 +180,8 @@ class UserController extends BaseController
             return redirect()->back()->with('error', 'User tidak ditemukan.');
         }
 
-        // Security: hanya bisa delete user yang dibuat oleh departemen ini
-        if ($user->created_by !== Auth::id()) {
+        // Superadmin bisa delete semua, Departemen hanya yang dibuat sendiri
+        if ((int) Auth::user()->role_id !== \App\Models\Role::SUPERADMIN && $user->created_by !== Auth::id()) {
             return redirect()->route('users.index')
                 ->with('error', 'Anda tidak memiliki akses untuk menghapus user ini.');
         }

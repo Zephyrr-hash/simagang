@@ -24,9 +24,16 @@ class LowonganController extends BaseController
 
     public function index()
     {
-        $mitra       = Mitra::where('user_id', Auth::id())->firstOrFail();
-        $low         = Lowongan::with('kategori')->where('mitra_id', $mitra->id)->get();
         $authProfile = $this->getAuthProfile();
+
+        // Superadmin melihat semua lowongan dari semua mitra
+        if ((int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN) {
+            $low = Lowongan::with('kategori', 'mitra')->get();
+            return view('mitra.lowongan.index', compact('low', 'authProfile'));
+        }
+
+        $mitra = Mitra::where('user_id', Auth::id())->firstOrFail();
+        $low   = Lowongan::with('kategori')->where('mitra_id', $mitra->id)->get();
         return view('mitra.lowongan.index', compact('low', 'authProfile'));
     }
 

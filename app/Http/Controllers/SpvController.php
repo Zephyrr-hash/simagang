@@ -12,6 +12,11 @@ class SpvController extends BaseController
 {
     public function supervisorHome()
     {
+        // Superadmin diarahkan ke dashboard-nya sendiri
+        if ((int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN) {
+            return redirect()->route('superadmin.home');
+        }
+
         $mhsLogbook = $this->countMhsLogbook();
         $nilai      = $this->countPenilaian();
         $authProfile = $this->getAuthProfile();

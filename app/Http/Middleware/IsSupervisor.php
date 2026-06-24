@@ -22,7 +22,7 @@ class IsSupervisor
             return redirect()->route('login');
         }
 
-        if (Auth::user()->role_id == Role::SUPERVISOR) {
+        if (Auth::user()->role_id == Role::SUPERVISOR || Auth::user()->role_id == Role::SUPERADMIN) {
             return $next($request);
         }
 

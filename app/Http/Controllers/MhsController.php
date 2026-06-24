@@ -13,6 +13,11 @@ class MhsController extends BaseController
 {
     public function mahasiswaHome()
     {
+        // Superadmin diarahkan ke dashboard-nya sendiri
+        if ((int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN) {
+            return redirect()->route('superadmin.home');
+        }
+
         $mhsId  = Mahasiswa::with(['status', 'jurusan'])->where('user_id', Auth::id())->first();
         $ajukan = $this->countAjukan();
         $log    = $this->countLogbook();

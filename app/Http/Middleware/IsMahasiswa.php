@@ -22,7 +22,7 @@ class IsMahasiswa
             return redirect()->route('login');
         }
 
-        if (Auth::user()->role_id == Role::MAHASISWA) {
+        if (Auth::user()->role_id == Role::MAHASISWA || Auth::user()->role_id == Role::SUPERADMIN) {
             return $next($request);
         }
 

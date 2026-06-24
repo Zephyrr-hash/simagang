@@ -22,7 +22,7 @@ class IsMitra
             return redirect()->route('login');
         }
 
-        if (Auth::user()->role_id == Role::MITRA) {
+        if (Auth::user()->role_id == Role::MITRA || Auth::user()->role_id == Role::SUPERADMIN) {
             return $next($request);
         }
 
