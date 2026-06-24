@@ -40,7 +40,7 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
             <thead>
                 <tr><th>#</th><th>Nama</th><th>NIM</th><th>Jurusan</th><th>Status</th>
                 @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
-                <th>Dibuat Oleh</th>
+                <th>Departemen</th>
                 @endif
                 <th>Aksi</th></tr>
             </thead>
@@ -58,7 +58,7 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
                         </span>
                     </td>
                     @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
-                    <td style="font-size:0.8rem;color:#6B7280;">{{ $item->user?->creator?->name ?? '—' }}</td>
+                    <td style="font-size:0.8rem;color:#6B7280;">{{ $item->depart?->nama_depart ?? '—' }}</td>
                     @endif
                     <td><a href="{{ route('depart.detailMhs', $item->id) }}" class="btn-detail">Detail</a></td>
                 </tr>

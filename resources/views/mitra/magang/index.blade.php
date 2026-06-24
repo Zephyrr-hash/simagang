@@ -37,7 +37,7 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
             <thead>
                 <tr><th>#</th><th>Nama Mahasiswa</th><th>Lowongan</th>
                 @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
-                <th>Perusahaan Mitra</th>
+                <th>Mitra</th>
                 @endif
                 <th>Tgl Mulai</th><th>Tgl Selesai</th><th>Status</th><th>Aksi</th></tr>
             </thead>

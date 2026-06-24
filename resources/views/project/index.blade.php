@@ -82,7 +82,7 @@
                 {{ $p->magang?->lowongan?->mitra?->nama_mitra ?? '—' }}
                 @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN && $p->magang?->spv)
                 <span style="color:#D1D5DB;">·</span>
-                <span style="color:#16A34A;">👷 {{ $p->magang?->spv?->nama_spv }}</span>
+                <span style="color:#16A34A;">Supervisor: {{ $p->magang?->spv?->nama_spv }}</span>
                 @endif
             </p>
             @if($p->teknologi)

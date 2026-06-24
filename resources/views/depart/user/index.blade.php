@@ -160,7 +160,7 @@
                     <th>Email</th>
                     <th>Role</th>
                     @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
-                    <th>Dibuat Oleh</th>
+                    <th>Dibuat Oleh (Departemen)</th>
                     @endif
                     <th>Aksi</th>
                 </tr>

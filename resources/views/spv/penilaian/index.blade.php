@@ -60,8 +60,10 @@
                 <p class="mhs-low">{{ $item->lowongan?->nama_low ?? '—' }}</p>
                 @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
                 <p class="mhs-low" style="color:#059669;">
-                    🏢 {{ $item->lowongan?->mitra?->nama_mitra ?? '—' }}
-                    @if($item->spv) · 👷 {{ $item->spv?->nama_spv }} @endif
+                    🏢 Mitra: {{ $item->lowongan?->mitra?->nama_mitra ?? '—' }}
+                </p>
+                <p class="mhs-low" style="color:#2563EB;">
+                    👷 Supervisor: {{ $item->spv?->nama_spv ?? '—' }}
                 </p>
                 @endif
             </div>
