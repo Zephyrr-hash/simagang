@@ -47,7 +47,7 @@ tbody td{padding:0.875rem 1rem;font-size:0.875rem;color:#374151;vertical-align:m
                     <td>{{ $item->lowongan?->nama_low ?? '—' }}</td>
                     <td>{{ $item->lowongan?->mitra?->nama_mitra ?? '—' }}</td>
                     @if(Auth::user()->role_id == \App\Models\Role::SUPERADMIN)
-                    <td style="font-size:0.8rem;color:#6B7280;">{{ $item->mahasiswa?->departemen?->nama_depart ?? '—' }}</td>
+                    <td style="font-size:0.8rem;color:#6B7280;">{{ $item->mahasiswa?->depart?->nama_depart ?? '—' }}</td>
                     @endif
                     <td><a href="{{ route('pengajuan.edit', $item->id) }}" class="btn-assign">Tugaskan Dosen</a></td>
                 </tr>

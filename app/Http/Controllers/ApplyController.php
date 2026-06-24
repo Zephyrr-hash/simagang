@@ -184,7 +184,7 @@ class ApplyController extends BaseController
         $authProfile  = $this->getAuthProfile();
         $isSuperadmin = (int) Auth::user()->role_id === \App\Models\Role::SUPERADMIN;
 
-        $query = Magang::with(['mahasiswa.departemen', 'lowongan.mitra'])
+        $query = Magang::with(['mahasiswa.depart', 'lowongan.mitra'])
             ->join('mahasiswa', 'magang.mhs_id', '=', 'mahasiswa.id')
             ->whereNull('magang.dosen_id')
             ->select('magang.*');
